@@ -1,0 +1,1294 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>TinyML Mid-Sem Drill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: sticky white app bar with topic tabs; one topic pane at a time on a dotted classroom-paper ground. Light theme only (deliberate). */
+:root{
+  --ground:#f8f9fa; --dot:#dfe3e8; --paper:#ffffff; --ink:#202124; --q:#1f1f1f; --sub:#5f6368; --faint:#9aa0a6; --line:#dadce0; --soft:#f1f3f4;
+  --ok:#137333; --ok-s:#e6f4ea; --ans:#f7fbf8; --ans-line:#cde8d5; --cream:#fff7ec; --cream-line:#f6e3c8; --amber:#e37400; --brown:#b06000; --red:#c5221f;
+  --head:"Google Sans",Roboto,"Segoe UI",Arial,sans-serif; --body:Roboto,"Segoe UI",Arial,sans-serif; --mono:"Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
+  --tc:#1967d2; --ts:#e8f0fe;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background-color:var(--ground);background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:22px 22px;
+  color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible{outline:2px solid var(--tc);outline-offset:2px}
+svg.ic{width:18px;height:18px;fill:currentColor;flex:0 0 auto}
+.wrap{max-width:1000px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+.ttl{padding-block:12px 4px}
+.ttl h1{margin:0;font-family:var(--head);font-weight:400;font-size:22px;line-height:1.3}
+.ttl p{margin:0;font-size:13px;color:var(--sub)}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;position:relative;padding:8px 14px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;border-radius:8px 8px 0 0}
+.tab:hover{background:var(--soft)}
+.tab .lb{font-family:var(--head);font-weight:500;font-size:14px;color:var(--sub);white-space:nowrap}
+.tab .pl{font-size:11px;font-weight:500;color:var(--sub);background:var(--soft);border-radius:10px;padding:1px 8px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tab[aria-selected="true"] .lb{color:var(--c)}
+.tab[aria-selected="true"] .pl{background:var(--c);color:#fff}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:4px;border-radius:4px 4px 0 0;background:var(--c)}
+
+main{padding-block:20px 80px}
+.pane{display:none}
+.pane.on{display:block}
+
+/* banner */
+.banner{position:relative;overflow:hidden;border-radius:12px;min-height:150px;padding:22px 24px;color:#fff;
+  background:linear-gradient(135deg,var(--tc) 0%,color-mix(in srgb,var(--tc) 62%,#fff) 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 1px 2px rgba(60,64,67,.2)}
+.banner.big{min-height:200px}
+.banner .motif{position:absolute;top:10px;right:14px;width:190px;height:130px;opacity:.3;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.banner .eyebrow{position:relative;font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.banner h2{position:relative;margin:2px 0 0;font-family:var(--head);font-weight:500;font-size:28px;line-height:1.2;max-width:75%;text-wrap:balance}
+.banner .meta{position:relative;margin-top:6px;font-size:14px;opacity:.95;font-variant-numeric:tabular-nums}
+.banner .acts{position:relative;display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.bb{height:36px;padding:0 18px;border-radius:18px;font-family:var(--head);font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.bb.fill{background:#fff;color:var(--tc)}
+.bb.fill:hover{box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.bb.line{border:1px solid rgba(255,255,255,.85);color:#fff}
+.bb.line:hover{background:rgba(255,255,255,.12)}
+.bb.line[aria-pressed="true"]{background:#fff;color:var(--tc)}
+
+/* cards */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 1px 2px rgba(60,64,67,.12);margin-top:18px;overflow:hidden;transition:box-shadow .15s}
+.card:hover{box-shadow:0 1px 3px rgba(60,64,67,.2),0 4px 10px rgba(60,64,67,.12)}
+.learn .lh{display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--cream);border-bottom:1px solid var(--cream-line)}
+.learn .lh .bk{width:32px;height:32px;border-radius:50%;background:var(--amber);display:grid;place-items:center;flex:0 0 auto}
+.learn .lh .bk svg{width:18px;height:18px;fill:#fff}
+.learn .lh h3{margin:0;font-family:var(--head);font-weight:500;font-size:16px;flex:1}
+.learn .lh button{font-family:var(--head);font-weight:500;font-size:13px;color:var(--brown);padding:6px 10px;border-radius:6px}
+.learn .lh button:hover{background:#fdebd3}
+.learn .lb{padding:6px 18px 16px}
+.learn.closed .lb{display:none}
+.learn h4{font-family:var(--head);font-weight:500;font-size:15px;margin:16px 0 4px;color:var(--tc)}
+.learn p{margin:.3em 0 .6em;max-width:72ch}
+
+.sect{display:flex;align-items:center;gap:12px;margin:30px 0 4px;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.09em;color:var(--tc);text-transform:uppercase}
+.sect::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 45%,transparent),transparent)}
+
+.qh{display:flex;align-items:center;gap:14px;padding:12px 18px;background:var(--ts)}
+.badge{width:42px;height:42px;border-radius:10px;background:var(--tc);color:#fff;display:grid;place-items:center;font-family:var(--head);font-weight:500;font-size:14px;flex:0 0 auto}
+.qh .t{flex:1;min-width:0}
+.qh .t b{display:block;font-family:var(--head);font-weight:500;font-size:15px}
+.qh .t span{font-size:12.5px;color:var(--sub)}
+.mk{font-family:var(--head);font-weight:500;font-size:12px;color:var(--tc);background:#fff;border:1px solid color-mix(in srgb,var(--tc) 35%,#fff);border-radius:12px;padding:2px 10px;white-space:nowrap}
+.qb{padding:14px 18px 16px 74px;min-width:0}
+.qt{font-size:16px;font-weight:500;color:var(--q);line-height:1.55;max-width:80ch}
+.qa{display:flex;gap:6px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.ob{height:34px;padding:0 14px;border:1px solid var(--line);border-radius:17px;color:var(--tc);font-family:var(--head);font-weight:500;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;background:#fff}
+.ob:hover{background:var(--ts)}
+.tb{height:34px;padding:0 12px;border-radius:17px;color:var(--sub);font-family:var(--head);font-weight:500;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
+.tb:hover{background:var(--soft)}
+.ops{display:grid;gap:8px;margin-top:12px;max-width:640px}
+.op{display:flex;align-items:flex-start;gap:12px;text-align:left;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fff;font-size:15px;line-height:1.45;transition:background .12s,border-color .12s}
+.op:hover{border-color:var(--tc);background:var(--ts)}
+.op .ol{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--head);font-weight:500;font-size:12.5px;color:var(--sub);background:#fff}
+.op.right,.op.reveal{border-color:var(--ok);background:var(--ok-s)}
+.op.right .ol,.op.reveal .ol{background:var(--ok);border-color:var(--ok);color:#fff}
+.op.wrong{border-color:var(--red);background:#fce8e6}
+.op.wrong .ol{background:var(--red);border-color:var(--red);color:#fff}
+.op[aria-disabled="true"]{cursor:default}
+.vd{font-family:var(--head);font-weight:500;font-size:14px;margin-bottom:4px}
+.vd.ok{color:var(--ok)} .vd.no{color:var(--red)}
+.q.done .qh{background:var(--ok-s)}
+.q.done .badge{background:var(--ok)}
+.q.done .tb{color:var(--ok)}
+.ans{display:none;margin-top:14px;background:var(--ans);border:1px solid var(--ans-line);border-radius:10px;padding:12px 16px;min-width:0}
+.ans.open{display:block}
+.ans .al{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ok);margin-bottom:4px}
+.ans p,.cs p{margin:.35em 0 .6em}
+ul,ol{margin:.3em 0 .7em;padding-left:1.4em}
+li{margin:.2em 0}
+table{border-collapse:collapse;margin:.5em 0 .9em;font-size:14px;width:100%;background:#fff;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-family:var(--head);font-weight:500}
+.tw{overflow-x:auto;max-width:100%}
+pre{background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid var(--tc,#1967d2);border-radius:8px;padding:12px 18px;font-family:var(--body);font-size:14.5px;font-weight:450;line-height:1.75;overflow-x:auto;margin:.6em 0 .9em;white-space:pre-wrap;color:#1e293b;max-width:100%}
+pre.calc-steps{display:flex;flex-direction:column;gap:8px;white-space:normal;padding:12px 16px}
+.step-line{display:flex;align-items:baseline;gap:12px;line-height:1.7}
+.step-badge{flex-shrink:0;font-weight:700;font-size:12px;letter-spacing:0.3px;color:var(--tc,#1967d2);background:var(--ts,#e8f0fe);padding:2px 9px;border-radius:6px;border:1px solid rgba(0,0,0,0.06);user-select:none;font-family:var(--body)}
+.step-badge-placeholder{flex-shrink:0;width:58px}
+.step-text{flex:1 1 auto;min-width:0;white-space:pre-wrap;font-family:var(--body);font-size:14.5px;color:#1e293b}
+.step-spacer{height:6px}
+@media (max-width:500px){
+  .step-line{flex-direction:column;gap:4px}
+  .step-badge-placeholder{display:none}
+}
+.q .calc-steps{gap:18px;padding:14px 18px;margin:.9em 0 1.1em}
+.q .calc-steps .step-line{margin-bottom:2px}
+.q .calc-steps .step-line.cont{margin-top:-10px}
+pre.code-block{font-family:var(--mono);font-size:13.5px;background:#f1f5f9;border:1px solid #cbd5e1;border-left:4px solid #64748b;color:#0f172a;white-space:pre-wrap;display:block}
+pre.code-block .code-line{display:block}
+code{font-family:var(--mono);font-size:.88em;font-weight:500;background:var(--soft);padding:1px 5px;border-radius:4px}
+.tip{font-size:13px;color:var(--sub);border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}
+.src{display:inline-block;font-size:11px;font-weight:500;color:var(--brown);background:#fef3e0;border-radius:4px;padding:0 6px;margin-right:4px}
+
+figure{margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto}
+figure svg{display:block;width:100%;min-width:520px;height:auto}
+figcaption{font-size:12.5px;color:var(--sub);margin-top:6px;text-align:center}
+
+/* start */
+.pad{padding:14px 20px 18px}
+.pad h3{font-family:var(--head);font-weight:500;font-size:17px;margin:.4em 0 .4em}
+.plantable td:first-child{white-space:nowrap;font-family:var(--mono);font-size:13px;font-weight:500}
+.plantable a{color:var(--c);font-weight:500;cursor:pointer;text-decoration:none}
+.plantable a:hover{text-decoration:underline}
+.tlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px}
+.tcard{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;box-shadow:0 1px 2px rgba(60,64,67,.12)}
+.tcard:hover{box-shadow:0 1px 3px rgba(60,64,67,.2),0 4px 10px rgba(60,64,67,.12)}
+.tcard .ci{width:40px;height:40px;border-radius:50%;background:var(--c);display:grid;place-items:center;flex:0 0 auto;font-family:var(--head);font-weight:500;color:#fff;font-size:16px}
+.tcard b{display:block;font-family:var(--head);font-weight:500;font-size:15px}
+.tcard span.s{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.must{display:inline-block;font-family:var(--head);font-size:11px;font-weight:500;color:var(--red);background:#fce8e6;border-radius:10px;padding:0 8px;margin-left:6px;vertical-align:2px}
+.pattern{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:10px 0}
+.pattern div{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.pattern b{font-family:var(--head);font-weight:500;color:var(--tc)}
+
+/* mock */
+.instr{background:#fff;border:1.5px dashed var(--tc);border-radius:12px;padding:14px 20px;margin-top:18px}
+.instr h3{margin:0 0 4px;font-family:var(--head);font-weight:500;font-size:16px;color:var(--tc)}
+
+/* last 15 & cards */
+.csgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:16px;margin-top:18px}
+.cs{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px;padding:12px 16px 14px;box-shadow:0 1px 2px rgba(60,64,67,.12);min-width:0}
+.cs h4{margin:0;font-family:var(--head);font-weight:500;font-size:16px;color:var(--c)}
+
+/* card head & notepad */
+.cs-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.cs-tools{display:flex;gap:6px}
+.cs-tool-btn{font-size:11.5px;font-family:var(--head);font-weight:500;color:var(--sub);padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;transition:all .15s}
+.cs-tool-btn:hover{background:var(--soft);color:var(--ink)}
+.cs-tool-btn.active{background:#e8f0fe;color:#1967d2;border-color:#1967d2}
+.cs-tool-btn.add-box-btn{color:var(--c);border-color:var(--c);background:#fff;font-weight:600}
+.cs-tool-btn.add-box-btn:hover{background:var(--c);color:#fff}
+pre.calc-box-custom{background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid var(--c,var(--tc,#1967d2));border-radius:8px;padding:12px 18px;font-family:var(--body);font-size:14px;line-height:1.75;margin:12px 0;white-space:pre-wrap;color:#1e293b;outline:none;min-height:48px}
+.cs-body[contenteditable="true"]{outline:2px dashed var(--c);outline-offset:4px;border-radius:6px;padding:4px;background:#fefefe}
+.cs-card-footer{display:flex;justify-content:flex-end;align-items:center;margin-top:10px;padding-top:8px}
+.cs-notepad{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px}
+.notepad-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.notepad-title{font-family:var(--head);font-size:12px;font-weight:500;color:var(--sub);display:flex;align-items:center;gap:4px;text-transform:uppercase;letter-spacing:.05em}
+.notepad-status{font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s;font-weight:500}
+.notepad-area{width:100%;min-height:70px;max-height:none;resize:vertical;border:1px solid #dadce0;border-radius:8px;padding:8px 12px;font-family:var(--body);font-size:13.5px;line-height:1.5;color:var(--ink);background:#fcfdfd;box-sizing:border-box}
+.notepad-area:focus{outline:none;border-color:var(--tc);background:#fff;box-shadow:0 0 0 2px var(--ts)}
+.notepad-footer{display:flex;justify-content:flex-end;margin-top:6px}
+.notepad-save-btn{background:#f1f5f9;border:1px solid #cbd5e1;border-radius:6px;padding:4px 12px;font-family:var(--head);font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.notepad-save-btn:hover{background:var(--ts);color:var(--tc);border-color:var(--tc)}
+
+/* split screen styling */
+.ttl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-block:12px 4px}
+.top-actions{display:flex;gap:8px;align-items:center}
+.top-btn{height:34px;padding:0 14px;border-radius:17px;font-family:var(--head);font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;color:var(--tc);cursor:pointer;transition:all .15s}
+.top-btn:hover{background:var(--ts);border-color:var(--tc)}
+.top-btn.exit-btn{background:#fee2e2;border-color:#ef4444;color:#b91c1c}
+.top-btn.exit-btn:hover{background:#fecaca}
+
+.split-bar{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#f1f5f9;border-radius:8px;margin-bottom:8px;flex-wrap:wrap;font-size:13px;font-family:var(--head)}
+.split-tag{font-weight:500;color:#475569}
+.split-sel{font-family:var(--head);font-size:13px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.split-swap-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:#fff;display:inline-grid;place-items:center;cursor:pointer;font-size:14px}
+.split-swap-btn:hover{background:var(--soft)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:1000;display:grid;place-items:center;padding:16px}
+.modal-card{background:#fff;border-radius:14px;max-width:480px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:22px 24px;border:1px solid var(--line)}
+.modal-card h3{margin:0 0 6px;font-family:var(--head);font-size:18px}
+.modal-card p{margin:0 0 16px;font-size:13.5px;color:var(--sub)}
+.modal-fields{display:grid;gap:12px;margin-bottom:16px}
+.modal-field{display:flex;flex-direction:column;gap:4px}
+.modal-field label{font-size:12px;font-weight:500;color:var(--sub);text-transform:uppercase;letter-spacing:.04em}
+.modal-select{padding:8px 12px;border-radius:8px;border:1px solid var(--line);font-size:14px;font-family:var(--head);background:#fff;cursor:pointer}
+.modal-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.preset-chip{font-size:12px;font-family:var(--head);padding:4px 10px;border-radius:12px;background:var(--soft);color:var(--sub);border:1px solid transparent;cursor:pointer}
+.preset-chip:hover{background:var(--ts);color:var(--tc);border-color:var(--tc)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px}
+.modal-btn{padding:8px 18px;border-radius:8px;font-family:var(--head);font-weight:500;font-size:13.5px;cursor:pointer}
+.modal-btn.primary{background:var(--tc);color:#fff}
+.modal-btn.primary:hover{opacity:.92}
+.modal-btn.secondary{background:var(--soft);color:var(--sub)}
+.modal-btn.secondary:hover{background:#e2e8f0}
+
+.split-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media (max-width:850px){.split-container{grid-template-columns:1fr}}
+.split-col{min-width:0;display:block}
+
+body.split-mode{height:100vh;max-height:100vh;overflow:hidden;display:flex;flex-direction:column}
+body.split-mode .bar{flex-shrink:0;position:static;z-index:100;border-bottom:1px solid var(--border)}
+body.split-mode .bar .wrap{max-width:100%;padding:0 16px}
+body.split-mode #main{flex:1 1 auto;height:calc(100vh - 125px);max-height:calc(100vh - 125px);max-width:100%;width:100%;padding:8px 16px;box-sizing:border-box;overflow:hidden}
+body.split-mode .split-container{display:flex;flex-direction:row;align-items:stretch;height:100%;max-height:100%;box-sizing:border-box;position:relative;overflow:hidden}
+body.split-mode .split-col{height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:6px 14px 80px 8px;background:var(--bg);border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04);box-sizing:border-box}
+body.split-mode #split-col-left{flex:0 0 var(--split-left,50%);min-width:220px;max-width:calc(100% - 240px)}
+body.split-mode #split-col-right{flex:1 1 0;min-width:220px}
+.split-divider{width:16px;margin:0 2px;cursor:col-resize;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:20;user-select:none;touch-action:none;border-radius:6px;transition:background .15s}
+.split-divider:hover,.split-divider.dragging{background:#e2e8f0}
+.split-divider::after{content:"";width:4px;height:42px;background:#94a3b8;border-radius:2px;transition:all .15s}
+.split-divider:hover::after,.split-divider.dragging::after{background:var(--tc,#1967d2);height:64px;width:5px}
+
+.split-ratio-group{display:inline-flex;align-items:center;background:#e2e8f0;border-radius:6px;padding:2px;gap:2px;margin:0 4px}
+.ratio-label{font-size:11.5px;color:var(--sub);margin:0 4px;font-weight:500}
+.ratio-btn{padding:3px 8px;font-size:11.5px;font-weight:600;border:none;background:transparent;color:#475569;border-radius:4px;cursor:pointer;transition:all .15s}
+.ratio-btn:hover{background:#cbd5e1;color:#0f172a}
+.ratio-btn.active{background:#fff;color:var(--tc,#1967d2);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+
+body.split-mode .split-col::-webkit-scrollbar{width:8px}
+body.split-mode .split-col::-webkit-scrollbar-track{background:#f1f5f9;border-radius:4px}
+body.split-mode .split-col::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+body.split-mode .split-col::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+@media (max-width:768px){
+  body.split-mode .split-container{flex-direction:column}
+  body.split-mode #split-col-left{flex:1 1 50%;max-width:100%}
+  body.split-mode #split-col-right{flex:1 1 50%}
+  .split-divider{width:100%;height:14px;cursor:row-resize;margin:2px 0}
+  .split-divider::after{width:42px;height:4px}
+  .split-ratio-group{display:none}
+}
+
+@media (max-width:600px){
+  .qb{padding:12px 14px 14px}
+  .banner{padding:18px}
+  .banner h2{font-size:23px;max-width:100%}
+  .banner .motif{width:110px;height:76px}
+  .qh{padding:10px 14px}
+  .csgrid,.tlist{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="bar"><div class="wrap">
+  <div class="ttl-row">
+    <div class="ttl"><h1>TinyML · Mid-Sem Drill</h1><p>Sir's 5 topics · learn by answering: MCQs → 2-mark → 5-mark · every answer teaches the idea</p></div>
+    <div class="top-actions">
+      <button class="top-btn" id="syncBtn" title="Sync / Study on Mobile with notes"><span class="sync-icon">📱</span> <span class="sync-txt">Study on Mobile</span></button>
+      <button class="top-btn" id="splitBtn" data-split-modal><span class="split-icon">◫</span> <span class="split-txt">Split view</span></button>
+    </div>
+  </div>
+  <div id="splitBar" class="split-bar" style="display:none">
+    <span class="split-tag">Split:</span>
+    <label>Left: <select id="splitLeftSelect" class="split-sel"></select></label>
+    <button class="split-swap-btn" id="splitSwapBtn" title="Swap sides">⇄</button>
+    <label>Right: <select id="splitRightSelect" class="split-sel"></select></label>
+    <div class="split-ratio-group">
+      <span class="ratio-label">Size:</span>
+      <button class="ratio-btn" data-ratio="30" title="Left 30% / Right 70%">30 : 70</button>
+      <button class="ratio-btn" data-ratio="40" title="Left 40% / Right 60%">40 : 60</button>
+      <button class="ratio-btn active" data-ratio="50" title="Equal 50% / 50%">50 : 50</button>
+      <button class="ratio-btn" data-ratio="60" title="Left 60% / Right 40%">60 : 40</button>
+      <button class="ratio-btn" data-ratio="70" title="Left 70% / Right 30%">70 : 30</button>
+    </div>
+    <button class="top-btn exit-btn" id="splitExitBtn">✕ Exit split view</button>
+  </div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Topics"></nav>
+</div></header>
+<div id="splitModalOverlay" class="modal-overlay" style="display:none">
+  <div class="modal-card">
+    <h3>Split Screen View</h3>
+    <p>Choose two tabs to study side-by-side.</p>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label>Left Tab</label>
+        <select id="modalLeftSelect" class="modal-select"></select>
+      </div>
+      <div class="modal-field">
+        <label>Right Tab</label>
+        <select id="modalRightSelect" class="modal-select"></select>
+      </div>
+    </div>
+    <div class="modal-presets">
+      <span style="font-size:12px;color:var(--sub);align-self:center;margin-right:2px">Presets:</span>
+      <button class="preset-chip" data-preset="qat,morning">QAT + 30 min</button>
+      <button class="preset-chip" data-preset="quant,morning">Quant + 30 min</button>
+      <button class="preset-chip" data-preset="cnn,morning">CNN + 30 min</button>
+      <button class="preset-chip" data-preset="mock,last">Mock + 10 min</button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="modalCancelBtn">Cancel</button>
+      <button class="modal-btn primary" id="modalApplyBtn">Open Split View</button>
+    </div>
+  </div>
+</div>
+<div id="syncModalOverlay" class="modal-overlay" style="display:none">
+  <div class="modal-card" style="max-width:520px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <h3 style="margin:0">📱 Study On Your Mobile Phone</h3>
+      <button class="modal-btn secondary" id="syncCloseBtn" style="padding:4px 10px;font-size:12px;border:none">✕</button>
+    </div>
+    <p style="margin:0 0 16px;color:var(--sub);font-size:13.5px">Take your questions, formulas, and all your personal notes to your phone for tomorrow's exam.</p>
+    
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:16px">
+      <div style="border:1px solid #cbd5e1;border-radius:10px;padding:14px;background:#f8fafc">
+        <div style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between">
+          <span>💾 1-Click: Download with all my notes baked in</span>
+          <span style="background:#e0f2fe;color:#0369a1;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px">Best for Exam Hall</span>
+        </div>
+        <p style="font-size:12.5px;color:var(--sub);margin:0 0 12px;line-height:1.5">Downloads an updated HTML file containing all your notes, custom edits, and formula annotations. AirDrop or WhatsApp it to your phone—opens instantly in Safari/Chrome and works <b>100% offline outside the exam hall without internet</b>, while still letting you edit & auto-save on mobile!</p>
+        <button class="modal-btn primary" id="downloadNotesBtn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;font-size:14px">📥 Download HTML with All My Notes</button>
+      </div>
+
+      <div style="border:1px solid #cbd5e1;border-radius:10px;padding:14px;background:#fff">
+        <div style="font-weight:600;font-size:13.5px;color:var(--ink);margin-bottom:4px">📋 Quick Sync Code (Copy / Paste)</div>
+        <p style="font-size:12.5px;color:var(--sub);margin:0 0 10px;line-height:1.5">Copy your notes and edits to transfer them to your phone, or paste notes from your phone back here.</p>
+        <div style="display:flex;gap:8px">
+          <button class="modal-btn secondary" id="copySyncBtn" style="flex:1">📋 Copy My Notes Code</button>
+          <button class="modal-btn secondary" id="importSyncBtn" style="flex:1">📥 Paste & Load Code</button>
+        </div>
+        <div id="syncStatusMsg" style="font-size:12px;color:var(--ok);font-weight:600;margin-top:8px;display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<main class="wrap" id="main"></main>
+
+<script>
+const DATA = {"topics": {"qat": [{"m": 1, "q": "In a single-neuron model y = x · w, what is w?", "o": ["The loss", "The weight the model learns", "The input value", "The target output"], "c": 1, "a": "<p>x is the input, y is the prediction, and <b>w is the weight<\/b>: the one number training adjusts so y gets close to the target.<\/p>"}, {"m": 1, "q": "Which loss does sir's QAT example use?", "o": ["|y_pred|", "y_pred × y_target", "y_target − 1", "(y_pred − y_target)²"], "c": 3, "a": "<p>Squared error: <b>L = (y_pred − y_target)²<\/b>. It is always positive and gets smaller as the prediction gets closer to the target.<\/p>"}, {"m": 1, "q": "For y = x · w and L = (y − t)², what is dL/dw?", "o": ["2x", "(y − t)/x", "y · t", "2(y − t) · x"], "c": 3, "a": "<p>Chain rule: dL/dy = 2(y − t), and dy/dw = x, so <b>dL/dw = 2(y − t) · x<\/b>.<\/p>"}, {"m": 1, "q": "Gradient descent updates a weight using…", "o": ["w_new = dL/dw", "w_new = w × lr", "w_new = w + lr × dL/dw", "w_new = w − lr × dL/dw"], "c": 3, "a": "<p>Move <b>against<\/b> the gradient so the loss goes down: <b>w_new = w − lr × dL/dw<\/b> (lr = learning rate).<\/p>"}, {"m": 1, "q": "What is fake quantization in QAT?", "o": ["Storing the model as text", "Deleting small weights", "Quantizing a weight and immediately dequantizing it back to float during training", "Training without labels"], "c": 2, "a": "<p>w_fake = round(w × 255)/255. The value is snapped to one of 256 levels but kept as a float, so training <b>feels the rounding error<\/b>.<\/p>"}, {"m": 1, "q": "Using w_fake = round(w × 255)/255, what is w_fake for w = 0.26?", "o": ["0.2588", "0.2549", "0.2600", "66"], "c": 0, "a": "<p>0.26 × 255 = 66.3 → round = 66 → 66/255 ≈ <b>0.2588<\/b>.<\/p>"}, {"m": 1, "q": "What does the STE (Straight-Through Estimator) do?", "o": ["Treats the slope of round() as 1 in the backward pass", "Converts the model to C", "Removes the bias", "Stops training early"], "c": 0, "a": "<p>round() is a staircase with slope 0, so the gradient would die. The STE <b>pretends its slope is 1<\/b> so the gradient passes straight through.<\/p>"}, {"m": 1, "q": "In QAT, which weight does gradient descent update?", "o": ["The target", "w_fake", "The input x", "The floating-point weight w_fp32"], "c": 3, "a": "<p>The <b>FP32 (shadow) weight<\/b> is updated. w_fake is recalculated from it (re-quantized) on every forward pass.<\/p>"}, {"m": 2, "q": "For a single neuron y = x · w with MSE loss, write the gradient dL/dw step by step (chain rule).", "a": "<pre>L = (y_pred − y_target)²\ndL/dy_pred = 2 (y_pred − y_target)\ndy_pred/dw = x\ndL/dw = dL/dy_pred × dy_pred/dw = 2 (y_pred − y_target) · x<\/pre>\n<p>In QAT, y_pred uses w_fake, and by the STE dw_fake/dw_fp32 ≈ 1, so dL/dw_fp32 ≈ 2(y_pred − y_target) · x.<\/p>"}, {"m": 2, "q": "Why do we need the Straight-Through Estimator in QAT?", "a": "<p>The forward pass uses w_fake = round(w × 255)/255. round() is a <b>staircase<\/b>: its slope is 0 everywhere (and undefined at the jumps). So the true gradient dw_fake/dw_fp32 = 0, the weight would never update, and training would stop.<\/p>\n<p>The STE <b>pretends round() is the identity<\/b> in the backward pass (gradient = 1 inside the range [β, α], 0 outside), so dL/dw_fp32 ≈ dL/dw_fake and the FP32 weight keeps learning.<\/p>"}, {"m": 2, "q": "Given w_fp32 = 0.26, lr = 0.1 and dL/dw = 0.0294, find the updated weight and its re-quantized value.", "a": "<pre>w_new = 0.26 − 0.1 × 0.0294 = 0.25706\nre-quantize: round(0.25706 × 255) = round(65.55) = 66 → w_fake = 66/255 ≈ 0.2588<\/pre>\n<p>The quantized weight did not change because the update (0.00294) is smaller than one step (1/255 ≈ 0.0039).<\/p>"}, {"m": 2, "q": "In sir's QAT table, the loss is the same in iteration 1 and 2 (0.000868) but drops in iteration 3. Explain why.", "a": "<p>In iteration 2 the FP32 weight is 0.25706, and round(0.25706 × 255) = 66, the <b>same code<\/b> as before, so w_fake, y_pred and the loss don't change.<\/p>\n<p>But the STE still lets the FP32 weight update (0.25706 → 0.25412). In iteration 3, round(0.25412 × 255) = round(64.80) = 65, so w_fake = 0.2549, y_pred ≈ 0.1274 and the loss drops to ≈ 0.000758. Small updates add up until they cross a quantization step.<\/p>"}, {"m": 5, "q": "<b>(Sir's example)<\/b> A single-neuron model y = x · w uses 8-bit fake quantization w_fake = round(w × 255)/255. Given x = 0.5, y_target = 0.1, w_fp32 = 0.26, learning rate = 0.1, perform one complete QAT pass: forward pass, loss, gradients, weight update, re-quantization, new prediction and new loss.", "a": "{{FIG:qatflow}}<p><b>Given:<\/b> x = 0.5, y_target = 0.1, w_fp32 = 0.26, lr = 0.1. Single neuron: y = x · w. Loss = (y_pred − y_target)². Fake quantization (8-bit, step 1/255): w_fake = round(w × 255)/255.<\/p>\n<p><b>Step 1, forward pass with fake quantization<\/b><\/p>\n<pre>w_fake = round(0.26 × 255)/255 = round(66.30)/255 = 66/255 ≈ 0.2588\ny_pred = x · w_fake = 0.5 × 0.2588 ≈ 0.1294\nLoss   = (y_pred − y_target)² = (0.1294 − 0.1)² ≈ 0.000865<\/pre>\n<p><b>Step 2, backward pass (gradients)<\/b><\/p>\n<pre>dL/dy_pred  = 2 (y_pred − y_target) = 2 × (0.1294 − 0.1) ≈ 0.0588\ndy_pred/dw_fake = x = 0.5\ndw_fake/dw_fp32 ≈ 1          (Straight-Through Estimator: treat round() as identity)\ndL/dw_fp32 ≈ 0.0588 × 0.5 ≈ 0.0294<\/pre>\n<p><b>Step 3, update the floating-point weight (gradient descent)<\/b><\/p>\n<pre>w_fp32,new = w_fp32 − lr × dL/dw_fp32 = 0.26 − 0.1 × 0.0294 ≈ 0.25706<\/pre>\n<p><b>Step 4, re-quantize the updated weight<\/b><\/p>\n<pre>w_fake,new = round(0.25706 × 255)/255 = round(65.55)/255 = 66/255 ≈ 0.2588<\/pre>\n<p><b>Step 5, new prediction and loss<\/b><\/p>\n<pre>y_pred,new = 0.5 × 0.2588 ≈ 0.1294\nLoss_new   = (0.1294 − 0.1)² ≈ 0.000865<\/pre><p><b>Comment:<\/b> the FP32 weight changed (0.26 → 0.25706), but the change is smaller than one quantization step (1/255 ≈ 0.0039), so it rounds to the same code 66. The new prediction and loss stay the same (0.000865). The FP32 “shadow” weight keeps collecting these small updates; after a few more iterations it crosses into the next level and the loss drops (sir's table: 0.000868 → 0.000758 at iteration 3).<\/p><p class=\"tip\">Sir's slide prints the loss as 0.000868. Computing with the exact w_fake = 66/255 gives 0.000865. Either value gets full marks as long as the steps are shown.<\/p>"}, {"m": 5, "q": "Perform one complete QAT pass for y = x · w with fake quantization w_fake = round(w × 255)/255. Given x = 0.8, y_target = 0.3, w_fp32 = 0.45, learning rate = 0.5. Show the forward pass, loss, gradients, FP32 weight update, re-quantized weight, and the new prediction and loss.", "a": "<p><b>Given:<\/b> x = 0.8, y_target = 0.3, w_fp32 = 0.45, lr = 0.5. Single neuron: y = x · w. Loss = (y_pred − y_target)². Fake quantization (8-bit, step 1/255): w_fake = round(w × 255)/255.<\/p>\n<p><b>Step 1, forward pass with fake quantization<\/b><\/p>\n<pre>w_fake = round(0.45 × 255)/255 = round(114.75)/255 = 115/255 ≈ 0.4510\ny_pred = x · w_fake = 0.8 × 0.4510 ≈ 0.3608\nLoss   = (y_pred − y_target)² = (0.3608 − 0.3)² ≈ 0.003695<\/pre>\n<p><b>Step 2, backward pass (gradients)<\/b><\/p>\n<pre>dL/dy_pred  = 2 (y_pred − y_target) = 2 × (0.3608 − 0.3) ≈ 0.1216\ndy_pred/dw_fake = x = 0.8\ndw_fake/dw_fp32 ≈ 1          (Straight-Through Estimator: treat round() as identity)\ndL/dw_fp32 ≈ 0.1216 × 0.8 ≈ 0.0973<\/pre>\n<p><b>Step 3, update the floating-point weight (gradient descent)<\/b><\/p>\n<pre>w_fp32,new = w_fp32 − lr × dL/dw_fp32 = 0.45 − 0.5 × 0.0973 ≈ 0.40137<\/pre>\n<p><b>Step 4, re-quantize the updated weight<\/b><\/p>\n<pre>w_fake,new = round(0.40137 × 255)/255 = round(102.35)/255 = 102/255 ≈ 0.4000<\/pre>\n<p><b>Step 5, new prediction and loss<\/b><\/p>\n<pre>y_pred,new = 0.8 × 0.4000 ≈ 0.3200\nLoss_new   = (0.3200 − 0.3)² ≈ 0.000400<\/pre><p><b>Comment:<\/b> the updated weight moved to a new quantization level (code 115 → 102), and the loss decreased from 0.003695 to 0.000400. QAT trains the weight <i>while<\/i> it is being quantized, so the final weights work well in INT8.<\/p>"}, {"m": 5, "q": "Perform one complete QAT pass for y = x · w (MSE loss, fake quantization w_fake = round(w × 255)/255). Given x = 1.0, y_target = 0.2, w_fp32 = 0.6, learning rate = 0.1.", "a": "<p><b>Given:<\/b> x = 1.0, y_target = 0.2, w_fp32 = 0.6, lr = 0.1. Single neuron: y = x · w. Loss = (y_pred − y_target)². Fake quantization (8-bit, step 1/255): w_fake = round(w × 255)/255.<\/p>\n<p><b>Step 1, forward pass with fake quantization<\/b><\/p>\n<pre>w_fake = round(0.6 × 255)/255 = round(153.00)/255 = 153/255 ≈ 0.6000\ny_pred = x · w_fake = 1.0 × 0.6000 ≈ 0.6000\nLoss   = (y_pred − y_target)² = (0.6000 − 0.2)² ≈ 0.160000<\/pre>\n<p><b>Step 2, backward pass (gradients)<\/b><\/p>\n<pre>dL/dy_pred  = 2 (y_pred − y_target) = 2 × (0.6000 − 0.2) ≈ 0.8000\ndy_pred/dw_fake = x = 1.0\ndw_fake/dw_fp32 ≈ 1          (Straight-Through Estimator: treat round() as identity)\ndL/dw_fp32 ≈ 0.8000 × 1.0 ≈ 0.8000<\/pre>\n<p><b>Step 3, update the floating-point weight (gradient descent)<\/b><\/p>\n<pre>w_fp32,new = w_fp32 − lr × dL/dw_fp32 = 0.6 − 0.1 × 0.8000 ≈ 0.52000<\/pre>\n<p><b>Step 4, re-quantize the updated weight<\/b><\/p>\n<pre>w_fake,new = round(0.52000 × 255)/255 = round(132.60)/255 = 133/255 ≈ 0.5216<\/pre>\n<p><b>Step 5, new prediction and loss<\/b><\/p>\n<pre>y_pred,new = 1.0 × 0.5216 ≈ 0.5216\nLoss_new   = (0.5216 − 0.2)² ≈ 0.103406<\/pre><p><b>Comment:<\/b> the updated weight moved to a new quantization level (code 153 → 133), and the loss decreased from 0.160000 to 0.103406. QAT trains the weight <i>while<\/i> it is being quantized, so the final weights work well in INT8.<\/p>"}, {"m": 5, "q": "Perform one complete QAT pass for y = x · w (MSE loss, fake quantization w_fake = round(w × 255)/255). Given x = 0.9, y_target = 0.4, w_fp32 = 0.31, learning rate = 0.3.", "a": "<p><b>Given:<\/b> x = 0.9, y_target = 0.4, w_fp32 = 0.31, lr = 0.3. Single neuron: y = x · w. Loss = (y_pred − y_target)². Fake quantization (8-bit, step 1/255): w_fake = round(w × 255)/255.<\/p>\n<p><b>Step 1, forward pass with fake quantization<\/b><\/p>\n<pre>w_fake = round(0.31 × 255)/255 = round(79.05)/255 = 79/255 ≈ 0.3098\ny_pred = x · w_fake = 0.9 × 0.3098 ≈ 0.2788\nLoss   = (y_pred − y_target)² = (0.2788 − 0.4)² ≈ 0.014684<\/pre>\n<p><b>Step 2, backward pass (gradients)<\/b><\/p>\n<pre>dL/dy_pred  = 2 (y_pred − y_target) = 2 × (0.2788 − 0.4) ≈ −0.2424\ndy_pred/dw_fake = x = 0.9\ndw_fake/dw_fp32 ≈ 1          (Straight-Through Estimator: treat round() as identity)\ndL/dw_fp32 ≈ −0.2424 × 0.9 ≈ −0.2181<\/pre>\n<p><b>Step 3, update the floating-point weight (gradient descent)<\/b><\/p>\n<pre>w_fp32,new = w_fp32 − lr × dL/dw_fp32 = 0.31 − 0.3 × −0.2181 ≈ 0.37544<\/pre>\n<p><b>Step 4, re-quantize the updated weight<\/b><\/p>\n<pre>w_fake,new = round(0.37544 × 255)/255 = round(95.74)/255 = 96/255 ≈ 0.3765<\/pre>\n<p><b>Step 5, new prediction and loss<\/b><\/p>\n<pre>y_pred,new = 0.9 × 0.3765 ≈ 0.3388\nLoss_new   = (0.3388 − 0.4)² ≈ 0.003743<\/pre><p><b>Comment:<\/b> the updated weight moved to a new quantization level (code 79 → 96), and the loss decreased from 0.014684 to 0.003743. QAT trains the weight <i>while<\/i> it is being quantized, so the final weights work well in INT8.<\/p><p class=\"tip\">Here y_pred is <i>below<\/i> the target, so the gradient is negative and the weight goes <b>up<\/b>. Watch the sign: w − lr × (negative) = w + something.<\/p>"}], "quant": [{"m": 1, "q": "Converting a model from FP32 to INT8 makes it about…", "o": ["4× smaller", "8× smaller", "2× smaller", "the same size"], "c": 0, "a": "<p>32 bits → 8 bits, so <b>4× smaller<\/b> (a 75% saving).<\/p>"}, {"m": 1, "q": "What is the integer range of 8-bit asymmetric quantization?", "o": ["0 to 127", "−1 to 1", "0 to 255", "−127 to 127"], "c": 2, "a": "<p>Asymmetric uses unsigned codes <b>0 to 2⁸ − 1 = 255<\/b>; min → 0 and max → 255.<\/p>"}, {"m": 1, "q": "What is the integer range of 8-bit symmetric quantization?", "o": ["−255 to 255", "0 to 255", "−127 to 127", "−128 to 128"], "c": 2, "a": "<p><b>−127 to +127<\/b>. −128 is dropped so that +α and −α map to the same size.<\/p>"}, {"m": 1, "q": "In asymmetric quantization the scale s is…", "o": ["255/(max − min)", "max/127", "max − min", "(max − min)/255"], "c": 3, "a": "<p><b>s = (α − β)/(2ⁿ − 1) = (max − min)/255<\/b>: the real-number size of one integer step.<\/p>"}, {"m": 1, "q": "What is the zero-point z in asymmetric quantization?", "o": ["The scale", "The largest value", "Always 0", "The integer that represents the real value 0"], "c": 3, "a": "<p><b>z = round(−min/s)<\/b>: the code that real 0.0 maps to, so 0 is stored exactly.<\/p>"}, {"m": 1, "q": "What is the zero-point in symmetric quantization?", "o": ["255", "−128", "127", "0"], "c": 3, "a": "<p>Symmetric is centred on zero, so <b>z = 0<\/b> and x̂ = s · x_q.<\/p>"}, {"m": 1, "q": "The MSE between original x and dequantized x̂ is…", "o": ["Σ (x − x̂)", "x̂ / x", "(1/N) Σ (x − x̂)²", "max |x − x̂|"], "c": 2, "a": "<p><b>Mean Squared Error<\/b>: square each error, add them up, divide by the number of values N.<\/p>"}, {"m": 1, "q": "<i>(From class notes)<\/i> The data has one big outlier. Which range method is better?", "o": ["Min-Max", "Percentile", "Use 4 bits", "No quantization possible"], "c": 1, "a": "<p>Min-Max would stretch the range to include the outlier and make every step large. <b>Percentile<\/b> clips the outlier, so the normal values stay accurate.<\/p>"}, {"m": 2, "q": "Compare symmetric and asymmetric quantization (formulas and ranges).", "a": "<div class=\"tw\"><table><tr><th>Asymmetric<\/th><th>Symmetric<\/th><\/tr>\n<tr><td>Maps [β, α] (min, max) to [0, 2ⁿ − 1] = 0…255<\/td><td>Maps [−α, α] (α = max |x|) to [−(2ⁿ⁻¹ − 1), 2ⁿ⁻¹ − 1] = −127…127<\/td><\/tr>\n<tr><td>s = (α − β)/(2ⁿ − 1), z = round(−β/s)<\/td><td>s = α/(2ⁿ⁻¹ − 1), z = 0<\/td><\/tr>\n<tr><td>x_q = clamp(round(x/s) + z, 0, 255)<br>x̂ = s(x_q − z)<\/td><td>x_q = clamp(round(x/s), −127, 127)<br>x̂ = s · x_q<\/td><\/tr>\n<tr><td>Uses the full range, lower error for skewed data<\/td><td>Simpler maths, may waste part of the range<\/td><\/tr><\/table><\/div>"}, {"m": 2, "q": "A tensor has range [−2, 6]. Find the 8-bit asymmetric scale and zero-point, then quantize x = 1.5.", "a": "<pre>s = (6 − (−2))/255 = 8/255 ≈ 0.03137\nz = round(2 / 0.03137) = round(63.75) = 64\nx_q = round(1.5 / 0.03137) + 64 = round(47.81) + 64 = 48 + 64 = 112\ncheck: x̂ = 0.03137 × (112 − 64) ≈ 1.506<\/pre>"}, {"m": 2, "q": "Using the classic formula q = round((w − min)/(max − min) × 255), quantize w = 2.7 with min = −3, max = 6 and dequantize it.", "a": "<pre>(w − min)/(max − min) = (2.7 + 3)/9 = 5.7/9 ≈ 0.6333\nq = round(0.6333 × 255) = round(161.5) = 162\nw_deq = 162/255 × 9 − 3 ≈ 5.7176 − 3 = 2.7176 ≈ 2.718   (error ≈ 0.018)<\/pre>"}, {"m": 2, "q": "Why is −128 not used in 8-bit symmetric quantization?", "a": "<p>A signed 8-bit integer goes from −128 to +127, which is <b>not symmetric<\/b>. To map [−α, +α] evenly, both ends must have the same magnitude, so we use [−127, +127] and sacrifice −128. Then +α ↔ +127 and −α ↔ −127, with one scale s = α/127.<\/p>"}, {"m": 2, "q": "<i>(From class notes)<\/i> When should you choose Percentile instead of Min-Max to set the quantization range? Use the outlier example.", "a": "<p><b>Plot all the values first.<\/b> If there is <b>no outlier<\/b>, use <b>Min-Max<\/b> (α = max, β = min) to cover everything. If there <b>is an outlier<\/b>, use <b>Percentile<\/b>: Min-Max stretches the range for one value and makes the step size large for all the others.<\/p><p>Slide example with outlier 1000: Min-Max gives 43.31 → 45.08 and 38.48 → 36.88 (large errors). Percentile clips the range, so 43.31 → 43.38 and 38.48 → 38.48; only the outlier (1000 → 50.00) is badly off.<\/p>"}, {"m": 2, "q": "<i>(From class notes)<\/i> An Arduino board can only do integer arithmetic. Show how it computes 2.6 + 3.5 and 2 × 0.3 using a scale of 10.", "a": "<pre>Addition:  2.6 → 26,  3.5 → 35     (multiply by scale 10)\n           26 + 35 = 61               (integer add)\n           61 / 10 = 6.1              (divide by scale)\n\nMultiply:  0.3 → 3\n           2 × 3 = 6                  (integer multiply)\n           6 / 10 = 0.6               (bring back the decimal)<\/pre><p>This is the idea behind quantization: store numbers as integers with a <b>scale<\/b>, do fast integer maths, and divide by the scale (dequantize) only at the end.<\/p>"}, {"m": 5, "q": "Apply 8-bit <b>asymmetric<\/b> quantization to the vector [43.31, −44.93, 0, 22.99, −43.93]. Find the scale, zero-point, quantized values, dequantized values and the MSE.", "a": "{{FIG:asym}}<p><b>Asymmetric 8-bit<\/b> maps the real range [β, α] = [min, max] onto [0, 2ⁿ − 1] = [0, 255].<\/p>\n<pre>s   = (α − β)/(2^n − 1)\nz   = round(−β / s)\nx_q = clamp( round(x/s) + z , 0, 255 )\nx̂   = s × (x_q − z)\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, range:<\/b> α = max = 43.31, β = min = −44.93<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = (43.31 − (−44.93))/255 = 88.24/255 ≈ 0.34604\nz = round(−(−44.93) / 0.34604) = round(129.84) = 130<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize every value:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x/s + z<\/th><th>x_q<\/th><th>x̂ = s(x_q − z)<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>43.31<\/td><td>125.16<\/td><td>255.16<\/td><td><b>255<\/b><\/td><td>43.25<\/td><td>0.06<\/td><td>0.0030<\/td><\/tr><tr><td>−44.93<\/td><td>−129.84<\/td><td>0.16<\/td><td><b>0<\/b><\/td><td>−44.99<\/td><td>0.06<\/td><td>0.0030<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td>130.00<\/td><td><b>130<\/b><\/td><td>0.00<\/td><td>0.00<\/td><td>0.0000<\/td><\/tr><tr><td>22.99<\/td><td>66.44<\/td><td>196.44<\/td><td><b>196<\/b><\/td><td>22.84<\/td><td>0.15<\/td><td>0.0229<\/td><\/tr><tr><td>−43.93<\/td><td>−126.95<\/td><td>3.05<\/td><td><b>3<\/b><\/td><td>−43.95<\/td><td>0.02<\/td><td>0.0003<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.0030 + 0.0030 + 0.0000 + 0.0229 + 0.0003) / 5 ≈ 0.0059<\/pre>\n<p><b>Comment:<\/b> 0 maps exactly to the zero-point 130, so it has no error. Every error is at most s/2 ≈ 0.173. Each value now takes 1 byte instead of 4.<\/p>"}, {"m": 5, "q": "Apply 8-bit <b>symmetric<\/b> quantization to the vector [43.31, −44.93, 0, 22.99, −11.35]. Find the scale, zero-point, quantized values, dequantized values and the MSE.", "a": "{{FIG:sym}}<p><b>Symmetric 8-bit<\/b> maps [−α, +α] (α = largest absolute value) onto [−127, +127]. −128 is dropped to keep it symmetric. The zero-point is always 0.<\/p>\n<pre>α   = max |x|\ns   = α / (2^(n−1) − 1) = α / 127\nx_q = clamp( round(x/s), −127, 127 )\nx̂   = s × x_q\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, α:<\/b> α = max |x| = 44.93<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = 44.93 / 127 ≈ 0.35378\nz = 0   (symmetric)<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x_q<\/th><th>x̂ = s · x_q<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>43.31<\/td><td>122.42<\/td><td><b>122<\/b><\/td><td>43.16<\/td><td>0.15<\/td><td>0.0222<\/td><\/tr><tr><td>−44.93<\/td><td>−127.00<\/td><td><b>-127<\/b><\/td><td>−44.93<\/td><td>0.00<\/td><td>0.0000<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td><b>0<\/b><\/td><td>0.00<\/td><td>0.00<\/td><td>0.0000<\/td><\/tr><tr><td>22.99<\/td><td>64.98<\/td><td><b>65<\/b><\/td><td>23.00<\/td><td>−0.01<\/td><td>0.0000<\/td><\/tr><tr><td>−11.35<\/td><td>−32.08<\/td><td><b>-32<\/b><\/td><td>−11.32<\/td><td>−0.03<\/td><td>0.0008<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.0222 + 0.0000 + 0.0000 + 0.0000 + 0.0008) / 5 ≈ 0.0046<\/pre>\n<p><b>Comment:<\/b> 0 → 0 exactly. Maximum error is s/2 ≈ 0.177. The maths is simpler (x̂ = s·x_q), but if the data is not centred around 0, part of the range is wasted.<\/p>"}, {"m": 5, "q": "Apply 8-bit <b>asymmetric<\/b> quantization to x = [−1.8, −0.5, 0, 0.7, 2.6]. Compute the scale, zero-point, quantized and dequantized values, and the MSE.", "a": "<p><b>Asymmetric 8-bit<\/b> maps the real range [β, α] = [min, max] onto [0, 2ⁿ − 1] = [0, 255].<\/p>\n<pre>s   = (α − β)/(2^n − 1)\nz   = round(−β / s)\nx_q = clamp( round(x/s) + z , 0, 255 )\nx̂   = s × (x_q − z)\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, range:<\/b> α = max = 2.60, β = min = −1.80<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = (2.60 − (−1.80))/255 = 4.40/255 ≈ 0.01725\nz = round(−(−1.80) / 0.01725) = round(104.32) = 104<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize every value:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x/s + z<\/th><th>x_q<\/th><th>x̂ = s(x_q − z)<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>−1.80<\/td><td>−104.32<\/td><td>−0.32<\/td><td><b>0<\/b><\/td><td>−1.7945<\/td><td>−0.0055<\/td><td>0.00003014<\/td><\/tr><tr><td>−0.50<\/td><td>−28.98<\/td><td>75.02<\/td><td><b>75<\/b><\/td><td>−0.5004<\/td><td>0.0004<\/td><td>0.00000015<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td>104.00<\/td><td><b>104<\/b><\/td><td>0.0000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><tr><td>0.70<\/td><td>40.57<\/td><td>144.57<\/td><td><b>145<\/b><\/td><td>0.7075<\/td><td>−0.0075<\/td><td>0.00005552<\/td><\/tr><tr><td>2.60<\/td><td>150.68<\/td><td>254.68<\/td><td><b>255<\/b><\/td><td>2.6055<\/td><td>−0.0055<\/td><td>0.00003014<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.00003014 + 0.00000015 + 0.00000000 + 0.00005552 + 0.00003014) / 5 ≈ 0.00002319<\/pre>\n<p><b>Comment:<\/b> 0 maps exactly to the zero-point 104, so it has no error. Every error is at most s/2 ≈ 0.009. Each value now takes 1 byte instead of 4.<\/p>"}, {"m": 5, "q": "Apply 8-bit <b>symmetric<\/b> quantization to the same x = [−1.8, −0.5, 0, 0.7, 2.6]. Compute the scale, zero-point, quantized and dequantized values, and the MSE. Which scheme gives the lower MSE, and why?", "a": "<p><b>Symmetric 8-bit<\/b> maps [−α, +α] (α = largest absolute value) onto [−127, +127]. −128 is dropped to keep it symmetric. The zero-point is always 0.<\/p>\n<pre>α   = max |x|\ns   = α / (2^(n−1) − 1) = α / 127\nx_q = clamp( round(x/s), −127, 127 )\nx̂   = s × x_q\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, α:<\/b> α = max |x| = 2.60<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = 2.60 / 127 ≈ 0.02047\nz = 0   (symmetric)<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x_q<\/th><th>x̂ = s · x_q<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>−1.80<\/td><td>−87.92<\/td><td><b>-88<\/b><\/td><td>−1.8016<\/td><td>0.0016<\/td><td>0.00000248<\/td><\/tr><tr><td>−0.50<\/td><td>−24.42<\/td><td><b>-24<\/b><\/td><td>−0.4913<\/td><td>−0.0087<\/td><td>0.00007502<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td><b>0<\/b><\/td><td>0.0000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><tr><td>0.70<\/td><td>34.19<\/td><td><b>34<\/b><\/td><td>0.6961<\/td><td>0.0039<\/td><td>0.00001550<\/td><\/tr><tr><td>2.60<\/td><td>127.00<\/td><td><b>127<\/b><\/td><td>2.6000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.00000248 + 0.00007502 + 0.00000000 + 0.00001550 + 0.00000000) / 5 ≈ 0.00001860<\/pre>\n<p><b>Comment:<\/b> 0 → 0 exactly. Maximum error is s/2 ≈ 0.010. The maths is simpler (x̂ = s·x_q), but if the data is not centred around 0, part of the range is wasted.<\/p><p><b>Compare with asymmetric on the same vector:<\/b> asymmetric MSE ≈ 0.00002319, symmetric MSE ≈ 0.00001860. Asymmetric is lower because the data is not centred (range −1.8 to 2.6): symmetric uses [−2.6, 2.6], so about 0.8 of the negative side is wasted and the step is bigger (s ≈ 0.02047 vs 0.01725).<\/p>"}], "cnn": [{"m": 1, "q": "How many parameters does a MaxPooling2D layer have?", "o": ["4", "1 per pixel", "Depends on the image", "0"], "c": 3, "a": "<p>Max pooling only picks the biggest number in each 2×2 window. It learns nothing, so it has <b>0 parameters<\/b>.<\/p>"}, {"m": 1, "q": "What is the parameter formula for a Conv2D layer?", "o": ["(inputs + 1) × units", "k × k × filters", "(k × k × C_in + 1) × filters", "H × W × C"], "c": 2, "a": "<p>Each filter has k × k × C_in weights plus 1 bias. Multiply by the number of filters: <b>(k·k·C_in + 1) × F<\/b>.<\/p>"}, {"m": 1, "q": "Output size of a 3×3 convolution (no padding, stride 1) on a 28×28 image?", "o": ["14 × 14", "28 × 28", "26 × 26", "25 × 25"], "c": 2, "a": "<p>N − k + 1 = 28 − 3 + 1 = <b>26<\/b>. The filter can't hang over the edge, so we lose 1 pixel on each side.<\/p>"}, {"m": 1, "q": "2×2 max pooling on a 26×26×32 feature map gives…", "o": ["13 × 13 × 16", "26 × 26 × 16", "24 × 24 × 32", "13 × 13 × 32"], "c": 3, "a": "<p>Pooling halves height and width but keeps the channels: <b>13 × 13 × 32<\/b>.<\/p>"}, {"m": 1, "q": "Flattening a 5 × 5 × 64 feature map gives how many values?", "o": ["320", "69", "1,600", "3,200"], "c": 2, "a": "<p>Multiply all dimensions: 5 × 5 × 64 = <b>1,600<\/b>. Flatten has 0 parameters.<\/p>"}, {"m": 1, "q": "Parameters of Dense(10) after 128 inputs?", "o": ["138", "1,280", "1,300", "1,290"], "c": 3, "a": "<p>(inputs + 1) × units = (128 + 1) × 10 = <b>1,290<\/b> (1,280 weights + 10 biases).<\/p>"}, {"m": 1, "q": "How many bytes does one parameter take in FP32 and INT8?", "o": ["32 and 8", "8 and 2", "2 and 1", "4 and 1"], "c": 3, "a": "<p>FP32 = 32 bits = <b>4 bytes<\/b>. INT8 = 8 bits = <b>1 byte<\/b>. Model size = parameters × bytes per parameter.<\/p>"}, {"m": 2, "q": "Find the parameters of Conv2D(64, (3,3)) applied to a 28 × 28 × 1 input. What is the output shape?", "a": "<pre>Params = (3 × 3 × 1 + 1) × 64 = 10 × 64 = 640\nOutput = (28 − 3 + 1) = 26 → 26 × 26 × 64<\/pre>"}, {"m": 2, "q": "Find the parameters of Conv2D(32, (3,3)) applied to a 13 × 13 × 32 input.", "a": "<pre>Params = (3 × 3 × 32 + 1) × 32 = 289 × 32 = 9,248\nOutput = 11 × 11 × 32<\/pre>"}, {"m": 2, "q": "A feature map 5 × 5 × 64 is flattened and fed to Dense(128). How many parameters does the Dense layer have?", "a": "<pre>Flatten = 5 × 5 × 64 = 1,600\nDense params = (1,600 + 1) × 128 = 204,928<\/pre>"}, {"m": 2, "q": "The slide's DNN is Flatten(28×28) → Dense(20, relu) → Dense(10, softmax). Find the total parameters and the size in FP32 and INT8.", "a": "<pre>Flatten   : 28 × 28 = 784          → 0\nDense(20) : (784 + 1) × 20 = 15,700\nDense(10) : (20 + 1) × 10  = 210\nTotal     = 15,910 parameters\nFP32 = 15,910 × 4 = 63,640 B ≈ 62.15 KB\nINT8 = 15,910 × 1 = 15,910 B ≈ 15.54 KB<\/pre>"}, {"m": 2, "q": "<i>(From class notes)<\/i> A dense layer takes 200 input features and has 20 neurons. What is the shape of its weight matrix and how many trainable parameters does it have?", "a": "<pre>Weight matrix = 200 × 20 = 4,000 weights\nBias vector   = 20\nTrainable parameters = (200 + 1) × 20 = 4,020\nFP32 size = 4,020 × 4 = 16,080 B ≈ 15.70 KB ;  INT8 ≈ 4,020 B ≈ 3.93 KB<\/pre><p>As the number of features or neurons grows, the weight matrix (and so the model size) grows too.<\/p>"}, {"m": 5, "q": "For the CNN: Input 28×28×1 → Conv2D(32,(3,3)) → MaxPool(2,2) → Conv2D(64,(3,3)) → MaxPool(2,2) → Flatten → Dense(128) → Dense(10), find the output shape and parameters of each layer, the total parameters, and the model size in FP32 and INT8.", "a": "{{FIG:cnn}}<p><b>Formulas<\/b> (valid padding, stride 1 as in the slides):<\/p>\n<pre>Conv output size    = N − k + 1\nConv parameters     = (k × k × C_in + 1) × filters      (+1 = one bias per filter)\nMaxPool(2,2) output = size ÷ 2,  parameters = 0\nFlatten             = H × W × C,  parameters = 0\nDense parameters    = (inputs + 1) × units<\/pre>\n<p><b>Layer-by-layer<\/b> (input 28 × 28 × 1):<\/p>\n<div class=\"tw\"><table><tr><th>Layer<\/th><th>Output shape<\/th><th>Parameters<\/th><\/tr><tr><td>Conv2D(32, (3,3))<\/td><td>26 × 26 × 32<\/td><td>(3×3×1 + 1) × 32 = 320<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>13 × 13 × 32<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(64, (3,3))<\/td><td>11 × 11 × 64<\/td><td>(3×3×32 + 1) × 64 = 18,496<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>5 × 5 × 64<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Flatten<\/td><td>1,600<\/td><td>0 (5×5×64 = 1,600)<\/td><\/tr><tr><td>Dense(128)<\/td><td>128<\/td><td>(1,600 + 1) × 128 = 204,928<\/td><\/tr><tr><td>Dense(10)<\/td><td>10<\/td><td>(128 + 1) × 10 = 1,290<\/td><\/tr>\n<tr><th>Total<\/th><th><\/th><th>225,034<\/th><\/tr><\/table><\/div>\n<p><b>Model size:<\/b><\/p>\n<pre>FP32: 225,034 × 4 bytes = 900,136 bytes ≈ 879.04 KB ≈ 0.86 MB\nINT8: 225,034 × 1 byte  = 225,034 bytes ≈ 219.76 KB ≈ 0.21 MB\nINT8 is 4× smaller (75% saving).<\/pre><p class=\"tip\">Check against your Assignment 1: TFLite FP32 = 883.06 KB and INT8 = 230.32 KB. The small extra is the model's structure (metadata), and Dropout has 0 parameters.<\/p>"}, {"m": 5, "q": "Slide model: Conv2D(64,(3,3), input 28×28×1) → MaxPool(2,2) → Conv2D(64,(3,3)) → MaxPool(2,2) → Flatten → Dense(128, relu) → Dense(10, softmax). Calculate the parameters layer by layer, the total, and the model size in FP32 and INT8.", "a": "<p><b>Formulas<\/b> (valid padding, stride 1 as in the slides):<\/p>\n<pre>Conv output size    = N − k + 1\nConv parameters     = (k × k × C_in + 1) × filters      (+1 = one bias per filter)\nMaxPool(2,2) output = size ÷ 2,  parameters = 0\nFlatten             = H × W × C,  parameters = 0\nDense parameters    = (inputs + 1) × units<\/pre>\n<p><b>Layer-by-layer<\/b> (input 28 × 28 × 1):<\/p>\n<div class=\"tw\"><table><tr><th>Layer<\/th><th>Output shape<\/th><th>Parameters<\/th><\/tr><tr><td>Conv2D(64, (3,3))<\/td><td>26 × 26 × 64<\/td><td>(3×3×1 + 1) × 64 = 640<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>13 × 13 × 64<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(64, (3,3))<\/td><td>11 × 11 × 64<\/td><td>(3×3×64 + 1) × 64 = 36,928<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>5 × 5 × 64<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Flatten<\/td><td>1,600<\/td><td>0 (5×5×64 = 1,600)<\/td><\/tr><tr><td>Dense(128)<\/td><td>128<\/td><td>(1,600 + 1) × 128 = 204,928<\/td><\/tr><tr><td>Dense(10)<\/td><td>10<\/td><td>(128 + 1) × 10 = 1,290<\/td><\/tr>\n<tr><th>Total<\/th><th><\/th><th>243,786<\/th><\/tr><\/table><\/div>\n<p><b>Model size:<\/b><\/p>\n<pre>FP32: 243,786 × 4 bytes = 975,144 bytes ≈ 952.29 KB ≈ 0.93 MB\nINT8: 243,786 × 1 byte  = 243,786 bytes ≈ 238.07 KB ≈ 0.23 MB\nINT8 is 4× smaller (75% saving).<\/pre>"}, {"m": 5, "q": "Horses vs humans model (slides): input 300×300×3 → Conv2D(16,3×3) → Pool → Conv2D(32,3×3) → Pool → Conv2D(64,3×3) → Pool → Conv2D(64,3×3) → Pool → Flatten → Dense(512) → Dense(1, sigmoid). Find the total parameters and the model size in FP32 and INT8. Which layer dominates?", "a": "<p><b>Formulas<\/b> (valid padding, stride 1 as in the slides):<\/p>\n<pre>Conv output size    = N − k + 1\nConv parameters     = (k × k × C_in + 1) × filters      (+1 = one bias per filter)\nMaxPool(2,2) output = size ÷ 2,  parameters = 0\nFlatten             = H × W × C,  parameters = 0\nDense parameters    = (inputs + 1) × units<\/pre>\n<p><b>Layer-by-layer<\/b> (input 300 × 300 × 3):<\/p>\n<div class=\"tw\"><table><tr><th>Layer<\/th><th>Output shape<\/th><th>Parameters<\/th><\/tr><tr><td>Conv2D(16, (3,3))<\/td><td>298 × 298 × 16<\/td><td>(3×3×3 + 1) × 16 = 448<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>149 × 149 × 16<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(32, (3,3))<\/td><td>147 × 147 × 32<\/td><td>(3×3×16 + 1) × 32 = 4,640<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>73 × 73 × 32<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(64, (3,3))<\/td><td>71 × 71 × 64<\/td><td>(3×3×32 + 1) × 64 = 18,496<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>35 × 35 × 64<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(64, (3,3))<\/td><td>33 × 33 × 64<\/td><td>(3×3×64 + 1) × 64 = 36,928<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>16 × 16 × 64<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Flatten<\/td><td>16,384<\/td><td>0 (16×16×64 = 16,384)<\/td><\/tr><tr><td>Dense(512)<\/td><td>512<\/td><td>(16,384 + 1) × 512 = 8,389,120<\/td><\/tr><tr><td>Dense(1)<\/td><td>1<\/td><td>(512 + 1) × 1 = 513<\/td><\/tr>\n<tr><th>Total<\/th><th><\/th><th>8,450,145<\/th><\/tr><\/table><\/div>\n<p><b>Model size:<\/b><\/p>\n<pre>FP32: 8,450,145 × 4 bytes = 33,800,580 bytes ≈ 33,008.38 KB ≈ 32.23 MB\nINT8: 8,450,145 × 1 byte  = 8,450,145 bytes ≈ 8,252.09 KB ≈ 8.06 MB\nINT8 is 4× smaller (75% saving).<\/pre><p><b>Comment:<\/b> almost all parameters (≈ 8.0 M) are in the Dense(512) layer after Flatten. Convolution layers are cheap because the same small filter is reused across the whole image.<\/p>"}], "deploy": [{"m": 1, "q": "Why is the .tflite model turned into a C array for a microcontroller?", "o": ["C arrays train faster", "To make it more accurate", "To encrypt it", "The MCU has no file system to open a file"], "c": 3, "a": "<p>A microcontroller has no OS or file system. The model bytes are compiled <b>into the program<\/b> as a C array and flashed with it.<\/p>"}, {"m": 1, "q": "Which file contains the model bytes as a C array?", "o": ["model_data.cc", "main.cc", "model_data.h", "mnist_image.h"], "c": 0, "a": "<p><b>model_data.cc<\/b>: <code>const unsigned char qat_model_quantized_tflite[] PROGMEM = {0x20, 0x00, …}<\/code>, length 23,752 bytes.<\/p>"}, {"m": 1, "q": "What is the purpose of model_data.h?", "o": ["Trains the model", "Declares the model array and its length (extern) so main.cc can use them", "Stores the images", "Runs inference"], "c": 1, "a": "<p>The header has <b>extern declarations<\/b> (+ include guards). main.cc includes it to know the array exists.<\/p>"}, {"m": 1, "q": "What is the tensor arena in main.cc?", "o": ["A fixed RAM block that holds all the tensors", "The training dataset", "The flash memory", "A type of layer"], "c": 0, "a": "<p><code>uint8_t tensor_arena[100*1024]<\/code>: <b>100 KB of RAM<\/b> for input, output and intermediate tensors. There's no dynamic memory on the MCU.<\/p>"}, {"m": 1, "q": "Which function loads the model from the byte array?", "o": ["Invoke()", "AllocateTensors()", "tflite::GetModel()", "Serial.begin()"], "c": 2, "a": "<p><b>GetModel(qat_model_quantized_tflite)<\/b> reads the FlatBuffer. main.cc then checks the schema version.<\/p>"}, {"m": 1, "q": "Which function actually runs inference?", "o": ["AllocateTensors()", "interpreter->Invoke()", "AddConv2D()", "GetModel()"], "c": 1, "a": "<p><b>Invoke()<\/b> runs the model once on the input tensor. main.cc times it with micros().<\/p>"}, {"m": 1, "q": "<i>(From class notes)<\/i> Firmware is…", "o": ["The program package flashed onto the device (code + memory/scripts info)", "The training data", "A type of sensor", "A cloud server"], "c": 0, "a": "<p>Firmware = the <b>compiled program flashed onto the chip<\/b>, here main.cc + model_data.cc built together.<\/p>"}, {"m": 2, "q": "Why is the .tflite model converted into a C array (model_data.cc) for a microcontroller?", "a": "<p>A microcontroller usually has <b>no file system or OS<\/b> to open a .tflite file. So the file's bytes are written into a C array (e.g. with <code>xxd -i<\/code>), compiled into the program and flashed with it. The model then sits in flash memory (PROGMEM) and is read directly by <code>GetModel()<\/code>.<\/p>"}, {"m": 2, "q": "What is MicroMutableOpResolver&lt;6&gt; in main.cc and why does it list only six operations?", "a": "<p>The op resolver tells the interpreter <b>which kernels (operations) to include<\/b>. main.cc registers only the 6 ops this model uses: Quantize, Conv2D, MaxPool2D, Reshape, FullyConnected, Dequantize. Registering only what is needed keeps the program small enough for the MCU's limited flash.<\/p>"}, {"m": 2, "q": "What do AllocateTensors() and Invoke() do?", "a": "<ul><li><b>AllocateTensors()<\/b>: plans and allocates memory for every tensor inside the tensor arena. It fails if the arena (100 KB) is too small.<\/li><li><b>Invoke()<\/b>: runs the model once on the data in the input tensor and writes the result to the output tensor. main.cc times it with micros().<\/li><\/ul>"}, {"m": 2, "q": "Explain the interconnection between main.cc, model_data.cc and model_data.h.", "a": "<ul><li><b>model_data.cc<\/b> defines the model bytes: <code>const unsigned char qat_model_quantized_tflite[] PROGMEM = {0x20,0x00,…}<\/code> and <code>qat_model_quantized_tflite_len = 23752<\/code>.<\/li><li><b>model_data.h<\/b> declares them with <code>extern<\/code>, so other files know they exist.<\/li><li><b>main.cc<\/b> does <code>#include \"model_data.h\"<\/code>, passes the array to <code>tflite::GetModel()<\/code>, builds the interpreter and runs inference.<\/li><\/ul><p>At build time the linker joins them into one program flashed to the ESP32.<\/p>"}, {"m": 5, "q": "Explain the complete hardware deployment workflow for running a trained ML model on an embedded device (e.g. ESP32), from training to inference.", "a": "{{FIG:workflow}}<p><b>1. Train<\/b> the model in TensorFlow/Keras (Google Colab).<\/p>\n<p><b>2. Convert<\/b> it with the TFLite Converter to a <code>.tflite<\/code> FlatBuffer: fixed topology and weights, made only for inference.<\/p>\n<pre>converter = tf.lite.TFLiteConverter.from_keras_model(model)\nconverter.optimizations = [tf.lite.Optimize.DEFAULT]\ntflite_model = converter.convert()<\/pre>\n<p><b>3. Optimize<\/b>: quantization (PTQ or QAT, FP32 → INT8, 4× smaller) and pruning.<\/p>\n<p><b>4. Convert to a C array<\/b>: the MCU has no file system, so the .tflite bytes are turned into <b>model_data.cc<\/b> (array + length) with a header <b>model_data.h<\/b>.<\/p>\n<p><b>5. Write main.cc<\/b> using TensorFlow Lite Micro: tensor arena → GetModel → op resolver → MicroInterpreter → AllocateTensors → fill input → Invoke → read output.<\/p>\n<p><b>6. Compile and flash<\/b> to the board (Arduino IDE / ESP-IDF). The model lives in flash, tensors in RAM.<\/p>\n<p><b>7. Inference at the edge<\/b>: the board reads sensor data, runs the model and acts on the prediction, with no cloud needed.<\/p>\n<pre>Train (TF) → Convert (.tflite) → Optimize (INT8) → C array (model_data.cc/.h)\n→ main.cc + TFLite Micro → Flash to MCU → Inference on device<\/pre>"}, {"m": 5, "q": "Explain the main.cc program (MNIST on ESP32 with TFLite Micro) block by block. What is the role of each file in running the model?", "a": "{{FIG:files}}<p><b>Files:<\/b> <code>model_data.h<\/code> declares the model array and its length · <code>model_data.cc<\/code> holds the .tflite bytes (23,752 B, starts 0x20 0x00 0x00 0x00 0x54 0x46 0x4c 0x33 = “TFL3”) in flash via PROGMEM · <code>main.cc<\/code> runs everything.<\/p>\n<ol><li><b>Includes:<\/b> model_data.h, mnist_image.h, micro_interpreter.h, micro_mutable_op_resolver.h, schema_generated.h.<\/li>\n<li><b>Tensor arena:<\/b> <code>constexpr int kTensorArenaSize = 100*1024; alignas(16) uint8_t tensor_arena[kTensorArenaSize];<\/code><\/li>\n<li><b>setup():<\/b> Serial.begin(115200); print flash size, free heap and model size (bytes/KB/MB).<\/li>\n<li><b>Load model:<\/b> <code>model = tflite::GetModel(qat_model_quantized_tflite)<\/code>; check <code>model-&gt;version() == TFLITE_SCHEMA_VERSION<\/code>.<\/li>\n<li><b>Register ops:<\/b> <code>MicroMutableOpResolver&lt;6&gt;<\/code>: AddQuantize, AddConv2D, AddMaxPool2D, AddReshape, AddFullyConnected, AddDequantize.<\/li>\n<li><b>Interpreter:<\/b> <code>MicroInterpreter(model, resolver, tensor_arena, kTensorArenaSize)<\/code> → <code>AllocateTensors()<\/code>.<\/li>\n<li><b>Input/output:<\/b> <code>input = interpreter-&gt;input(0)<\/code> (FLOAT32 [1×28×28×1]); <code>output<\/code> [1×10].<\/li>\n<li><b>Load image:<\/b> copy 784 pixels: <code>input-&gt;data.f[i] = mnist_image[i]<\/code>.<\/li>\n<li><b>Run:<\/b> <code>start = micros(); interpreter-&gt;Invoke();<\/code> inference time = micros() − start.<\/li>\n<li><b>Predict:<\/b> loop over the 10 outputs and take the largest (argmax), which is the predicted digit. Print a memory summary. <code>loop()<\/code> is empty.<\/li><\/ol>"}], "tech": [{"m": 1, "q": "TinyML means…", "o": ["ML for phones only", "Running ML on tiny, low-power microcontrollers on the device", "Training very small datasets", "ML that only runs in the cloud"], "c": 1, "a": "<p>TinyML = ML + embedded systems: <b>on-device<\/b> sensor analytics at <b>milliwatt<\/b> power, always-on and battery-powered.<\/p>"}, {"m": 1, "q": "Which is NOT one of the three model compression techniques in the slides?", "o": ["Pruning", "Knowledge distillation", "Quantization", "Data augmentation"], "c": 3, "a": "<p>The three compression techniques are <b>pruning, quantization and knowledge distillation<\/b>. Data augmentation creates more training data; it doesn't shrink the model.<\/p>"}, {"m": 1, "q": "Knowledge distillation trains…", "o": ["Only the bias", "A small student model to mimic a large teacher model", "A big model from a small one", "A model without data"], "c": 1, "a": "<p><b>Student mimics teacher<\/b>, during training, so you get a small model with close to the big model's accuracy.<\/p>"}, {"m": 1, "q": "Pruning removes…", "o": ["Unimportant synapses (weights) or neurons", "The bias only", "Training data", "The output layer"], "c": 0, "a": "<p>Pruning <b>cuts weights or neurons<\/b> that barely affect the output, so the model gets smaller and faster.<\/p>"}, {"m": 1, "q": "Post-Training Quantization (PTQ) is done…", "o": ["During training with fake quantization", "After training, without retraining", "Before training", "Only on the input image"], "c": 1, "a": "<p>PTQ: pre-trained model → attach observers → calibrate → compute s, z → quantized model. <b>No retraining.<\/b><\/p>"}, {"m": 1, "q": "Typical RAM of a microcontroller (slides)?", "o": ["512 MB – 64 GB", "64 GB – 4 TB", "2 KB – 512 KB", "1 – 4 GB"], "c": 2, "a": "<p>MCU: <b>2–512 KB RAM<\/b>, 1–400 MHz, 150 µW–23.5 mW. A microprocessor has 512 MB–64 GB.<\/p>"}, {"m": 1, "q": "In machine learning we give the computer…", "o": ["Rules + Data to get Answers", "Only rules", "Answers (labels) + Data to get Rules", "Only answers"], "c": 2, "a": "<p>Traditional programming: Rules + Data → Answers. <b>ML: Answers + Data → Rules<\/b> (the model).<\/p>"}, {"m": 1, "q": "In gradient-based pruning, the importance of a weight is…", "o": ["w + 1", "|w × ∂L/∂w|", "∂L/∂w only", "|w|"], "c": 1, "a": "<p><b>S = |w × ∂L/∂w|<\/b> estimates how much the loss changes if that weight is removed. Prune the lowest S.<\/p>"}, {"m": 1, "q": "Quantized INT8 models are up to __ faster on CPU (slides).", "o": ["2–4×", "100×", "10–20×", "Not faster"], "c": 0, "a": "<p>Slides: <b>2–4× faster on CPU and 4× smaller<\/b>, because integer maths is cheaper and moves less memory.<\/p>"}, {"m": 2, "q": "Compare PTQ and QAT.", "a": "<div class=\"tw\"><table><tr><th><\/th><th>PTQ<\/th><th>QAT<\/th><\/tr>\n<tr><td>When<\/td><td>After training<\/td><td>During training<\/td><\/tr>\n<tr><td>How<\/td><td>Pre-trained model → attach observers → calibrate with unlabeled data → compute s, z → quantized model<\/td><td>Fake quantize→dequantize in the forward pass; STE in the backward pass<\/td><\/tr>\n<tr><td>Cost<\/td><td>Fast, no retraining<\/td><td>Needs retraining<\/td><\/tr>\n<tr><td>Accuracy (MobileNet v1)<\/td><td>71.03% → 69.57% (▼1.46%)<\/td><td>71.06% (≈ FP32)<\/td><\/tr><\/table><\/div>"}, {"m": 2, "q": "Why do we need model compression for TinyML? Use the MobileNet example.", "a": "<p>ML models have grown huge (VGG-16 528 MB, ResNet 22.7 MB, MobileNetV1 16.9 MB), but a TinyML board has only <b>256 KB RAM<\/b>. Even MobileNetV1 is about 65× too big. Compression (pruning, quantization, knowledge distillation) shrinks the model to fit in KBs with little accuracy loss.<\/p>"}, {"m": 2, "q": "Why is an INT8 model faster and smaller than FP32? (summary slide)", "a": "<ul><li><b>Faster arithmetic<\/b>: an 8-bit integer multiply-add needs far fewer gates than 32-bit floating point.<\/li><li><b>Lower memory<\/b>: 8 bits instead of 32 means 75% less memory and 4× smaller.<\/li><li><b>Reduced resources<\/b>: many low-end MCUs/DSPs have no FPU, so integer models run there (portability).<\/li><\/ul><p>Slides: up to 2–4× faster on CPU and 4× smaller.<\/p>"}, {"m": 2, "q": "Differentiate pruning synapses and pruning neurons.", "a": "<ul><li><b>Pruning synapses:<\/b> individual connections (weights) are set to zero; the neurons stay. The weight matrix becomes sparse.<\/li><li><b>Pruning neurons:<\/b> whole neurons are removed along with all their connections, so the layer becomes smaller.<\/li><\/ul><p>Both reduce size and computation.<\/p>"}, {"m": 2, "q": "Differentiate microprocessor and microcontroller.", "a": "<div class=\"tw\"><table><tr><th><\/th><th>Microprocessor<\/th><th>Microcontroller<\/th><\/tr>\n<tr><td>Contents<\/td><td>Only the CPU; memory and storage are external<\/td><td>CPU + ROM + RAM + timer + I/O + serial on one chip<\/td><\/tr>\n<tr><td>Use<\/td><td>General purpose (laptops, servers)<\/td><td>Fixed-function embedded systems<\/td><\/tr>\n<tr><td>Compute / memory<\/td><td>1–4 GHz, 512 MB–64 GB<\/td><td>1–400 MHz, 2–512 KB<\/td><\/tr>\n<tr><td>Power<\/td><td>30–100 W<\/td><td>150 µW–23.5 mW<\/td><\/tr><\/table><\/div>"}, {"m": 2, "q": "Why do we run ML on the edge (TinyML) instead of the cloud?", "a": "<p>Cloud = high power, high bandwidth, high latency. On-device ML helps with:<\/p><ul><li><b>Bandwidth<\/b>: send results, not raw data.<\/li><li><b>Reliability<\/b>: works offline.<\/li><li><b>Latency<\/b>: instant response.<\/li><li><b>Privacy<\/b>: data stays on the device.<\/li><li><b>Energy<\/b>: no power-hungry radio streaming.<\/li><\/ul>"}, {"m": 5, "q": "Explain the TinyML model compression techniques (pruning, quantization, knowledge distillation) and their purposes.", "a": "{{FIG:mcu}}<p><b>Why:<\/b> models grew huge (AlexNet 61 MB, VGG-16 528 MB, MobileNetV1 16.9 MB), but an MCU has about 256 KB RAM, MHz clocks and milliwatts of power. Compression makes models fit.<\/p>\n<p><b>1. Pruning:<\/b> remove unimportant synapses (weights → 0) or whole neurons. Gradient-based pruning scores each weight by |w × ∂L/∂w| (how much the loss would change if it were removed) and removes the lowest, then fine-tunes. Purpose: fewer weights and operations, smaller model.<\/p>\n<p><b>2. Quantization:<\/b> reduce precision from FP32 to INT8. Weights are concentrated in a small range, so 256 levels are enough.<\/p>\n<ul><li><b>PTQ<\/b>: quantize after training (observers → calibrate → s, z).<\/li><li><b>QAT<\/b>: fake quantization during training plus STE; recovers accuracy.<\/li><\/ul>\n<p>Purpose: 4× smaller, 2–4× faster, integer-only, so it runs on MCUs without an FPU.<\/p>\n<p><b>3. Knowledge distillation:<\/b> a large <i>teacher<\/i> model trains a small <i>student<\/i> model to mimic its outputs (applied during training). Purpose: a small model with close to the teacher's accuracy.<\/p>\n<p><b>Conclusion:<\/b> combining these techniques (plus TFLite / TFLite Micro) lets ML run on tiny, low-power, low-cost devices.<\/p>"}, {"m": 5, "q": "Explain Post-Training Quantization with the numerical example x = 0.5, y_target = 0.1, w_FP32 = 0.26 (step 1/255).", "a": "<p><b>PTQ<\/b> quantizes an already trained FP32 model <b>after training<\/b>, without retraining.<\/p>\n<p><b>Step 1, forward pass in FP32:<\/b><\/p><pre>y_pred = 0.5 × 0.26 = 0.13\nLoss = (0.13 − 0.1)² = 0.0009<\/pre>\n<p><b>Step 2, quantize the weight after training:<\/b><\/p><pre>w_quant = round(0.26 × 255) = round(66.3) = 66\nw_quant_dequant = 66/255 ≈ 0.2588<\/pre>\n<p><b>Step 3, inference with the quantized weight:<\/b><\/p><pre>y_pred = 0.5 × 0.2588 ≈ 0.1294\nLoss = (0.1294 − 0.1)² ≈ 0.000865   (slide: 0.000868)<\/pre>\n<p><b>Flow:<\/b> Pre-trained model → attach observers → calibrate with unlabeled data → compute s and z → quantized model.<\/p>\n<p><b>Pros:<\/b> fast, no retraining, 4× smaller. <b>Cons:<\/b> small accuracy drop (MobileNet v1 71.03% → 69.57%). QAT is used when the drop is too large.<\/p>"}, {"m": 5, "q": "Explain gradient-based pruning. Prune 50% of w = [0.8, −0.05, 0.3, −0.6] with gradients ∂L/∂w = [0.01, 0.9, 0.2, 0.05].", "a": "<p><b>Pruning<\/b> removes weights that matter least. <b>Gradient-based pruning<\/b> measures importance by how much the loss would change if a weight were removed (set to 0). A first-order estimate:<\/p>\n<pre>Importance S = | w × ∂L/∂w |<\/pre>\n<pre>w        :  0.8    −0.05    0.3    −0.6\n∂L/∂w    :  0.01    0.9     0.2     0.05\nS=|w·g|  :  0.008   0.045   0.060   0.030\n\nLowest two (50%) → w1 (0.008) and w4 (0.030) are pruned\nPruned w = [0, −0.05, 0.3, 0]<\/pre>\n<p><b>Compare with magnitude pruning<\/b> (|w| only): it would remove −0.05 and 0.3, but −0.05 has a huge gradient (0.9), so the loss is very sensitive to it. Gradient-based pruning keeps it.<\/p>\n{{FIG:prune}}<p><b>Steps:<\/b> train → compute S → remove the lowest S (mask = 0) → fine-tune → repeat until the target sparsity.<\/p>"}]}, "mock1": [{"m": 1, "q": "8-bit uniform quantization of [0, 1] uses step size Δ = ?", "o": ["1/127", "1/256", "1/8", "1/255"], "c": 3, "a": "<p>Δ = 1/(2⁸ − 1) = <b>1/255<\/b>.<\/p>", "p": "A"}, {"m": 1, "q": "Quantize w = 0.83 with round(w × 255).", "o": ["211", "210", "212", "83"], "c": 2, "a": "<p>0.83 × 255 = 211.65 → <b>212<\/b> (→ 212/255 ≈ 0.8314).<\/p>", "p": "A"}, {"m": 1, "q": "Parameters of Conv2D(16, (3,3)) on a 300×300×3 image?", "o": ["160", "144", "432", "448"], "c": 3, "a": "<p>(3×3×3 + 1) × 16 = 28 × 16 = <b>448<\/b>.<\/p>", "p": "A"}, {"m": 1, "q": "Size of a model with 50,000 INT8 parameters?", "o": ["400,000 bytes", "12,500 bytes", "200,000 bytes", "50,000 bytes"], "c": 3, "a": "<p>INT8 = 1 byte each → <b>50,000 bytes<\/b> ≈ 48.83 KB.<\/p>", "p": "A"}, {"m": 1, "q": "Symmetric quantization of a vector with max |x| = 12.7 has scale…", "o": ["12.7", "1/255", "0.05", "0.1"], "c": 3, "a": "<p>s = α/127 = 12.7/127 = <b>0.1<\/b>.<\/p>", "p": "A"}, {"m": 1, "q": "If y_pred < y_target in QAT, the weight update makes w…", "o": ["decrease", "stay the same", "zero", "increase"], "c": 3, "a": "<p>dL/dw = 2(y − t)·x is negative, so w − lr·(negative) <b>increases<\/b> w.<\/p>", "p": "A"}, {"m": 1, "q": "Which function allocates tensor memory in TFLite Micro?", "o": ["AllocateTensors()", "GetModel()", "AddQuantize()", "Invoke()"], "c": 0, "a": "<p><b>AllocateTensors()<\/b> plans all tensors inside the tensor arena.<\/p>", "p": "A"}, {"m": 1, "q": "Which technique trains a small model to mimic a large one?", "o": ["Pruning", "Quantization", "Calibration", "Knowledge distillation"], "c": 3, "a": "<p><b>Knowledge distillation<\/b> (teacher → student).<\/p>", "p": "A"}, {"m": 1, "q": "Asymmetric: range [−1, 3], 8-bit. The zero-point is…", "o": ["255", "0", "127", "64"], "c": 3, "a": "<p>s = 4/255 ≈ 0.01569 → z = round(1/0.01569) = round(63.75) = <b>64<\/b>.<\/p>", "p": "A"}, {"m": 1, "q": "Dense(32) after a Flatten of 784 values has how many parameters?", "o": ["25,088", "25,120", "816", "25,121"], "c": 1, "a": "<p>(784 + 1) × 32 = <b>25,120<\/b>.<\/p>", "p": "A"}, {"p": "B", "m": 2, "q": "A tensor has range [−1, 3]. Find the 8-bit asymmetric scale and zero-point.", "a": "<pre>s = (3 − (−1))/255 = 4/255 ≈ 0.01569\nz = round(1/0.01569) = round(63.75) = 64<\/pre>"}, {"p": "B", "m": 2, "q": "Find the parameters of Conv2D(6, (5,5)) on a 32×32×1 input and its output shape.", "a": "<pre>Params = (5×5×1 + 1) × 6 = 26 × 6 = 156\nOutput = 32 − 5 + 1 = 28 → 28 × 28 × 6<\/pre>"}, {"p": "B", "m": 2, "q": "In QAT, y_pred = 0.36, y_target = 0.3, x = 0.8, lr = 0.5, w_fp32 = 0.45. Find dL/dw and the updated FP32 weight.", "a": "<pre>dL/dy = 2(0.36 − 0.3) = 0.12\ndL/dw = 0.12 × 0.8 = 0.096\nw_new = 0.45 − 0.5 × 0.096 = 0.402<\/pre>"}, {"p": "B", "m": 2, "q": "What is the role of the tensor arena and the op resolver in main.cc?", "a": "<ul><li><b>Tensor arena:<\/b> a fixed 100 KB RAM block holding all tensors (no dynamic memory on the MCU).<\/li><li><b>Op resolver<\/b> (MicroMutableOpResolver&lt;6&gt;): registers only the 6 ops the model needs (Quantize, Conv2D, MaxPool2D, Reshape, FullyConnected, Dequantize), which saves flash.<\/li><\/ul>"}, {"p": "B", "m": 2, "q": "Original x = [1.0, −0.5], dequantized x̂ = [0.98, −0.51]. Find the MSE.", "a": "<pre>errors: 0.02, 0.01 → squares 0.0004, 0.0001\nMSE = (0.0004 + 0.0001)/2 = 0.00025<\/pre>"}], "mock2": [{"p": "A", "m": 2, "q": "Compare PTQ and QAT (any four points).", "a": "<div class=\"tw\"><table><tr><th><\/th><th>PTQ<\/th><th>QAT<\/th><\/tr>\n<tr><td>When<\/td><td>After training<\/td><td>During training<\/td><\/tr>\n<tr><td>How<\/td><td>Pre-trained model → attach observers → calibrate with unlabeled data → compute s, z → quantized model<\/td><td>Fake quantize→dequantize in the forward pass; STE in the backward pass<\/td><\/tr>\n<tr><td>Cost<\/td><td>Fast, no retraining<\/td><td>Needs retraining<\/td><\/tr>\n<tr><td>Accuracy (MobileNet v1)<\/td><td>71.03% → 69.57% (▼1.46%)<\/td><td>71.06% (≈ FP32)<\/td><\/tr><\/table><\/div>"}, {"p": "A", "m": 2, "q": "Why do we need the STE in QAT?", "a": "<p>The forward pass uses w_fake = round(w × 255)/255. round() is a <b>staircase<\/b>: its slope is 0 everywhere (and undefined at the jumps). So the true gradient dw_fake/dw_fp32 = 0, the weight would never update, and training would stop.<\/p>\n<p>The STE <b>pretends round() is the identity<\/b> in the backward pass (gradient = 1 inside the range [β, α], 0 outside), so dL/dw_fp32 ≈ dL/dw_fake and the FP32 weight keeps learning.<\/p>"}, {"p": "A", "m": 2, "q": "Explain the roles of main.cc, model_data.cc and model_data.h.", "a": "<ul><li><b>model_data.cc<\/b> defines the model bytes: <code>const unsigned char qat_model_quantized_tflite[] PROGMEM = {0x20,0x00,…}<\/code> and <code>qat_model_quantized_tflite_len = 23752<\/code>.<\/li><li><b>model_data.h<\/b> declares them with <code>extern<\/code>, so other files know they exist.<\/li><li><b>main.cc<\/b> does <code>#include \"model_data.h\"<\/code>, passes the array to <code>tflite::GetModel()<\/code>, builds the interpreter and runs inference.<\/li><\/ul><p>At build time the linker joins them into one program flashed to the ESP32.<\/p>"}, {"p": "A", "m": 2, "q": "A feature map 13×13×32 is flattened into Dense(64). Find the Dense parameters.", "a": "<pre>Flatten = 13 × 13 × 32 = 5,408\nDense = (5,408 + 1) × 64 = 346,176<\/pre>"}, {"p": "A", "m": 2, "q": "Why is an INT8 model faster and smaller than FP32?", "a": "<ul><li><b>Faster arithmetic<\/b>: an 8-bit integer multiply-add needs far fewer gates than 32-bit floating point.<\/li><li><b>Lower memory<\/b>: 8 bits instead of 32 means 75% less memory and 4× smaller.<\/li><li><b>Reduced resources<\/b>: many low-end MCUs/DSPs have no FPU, so integer models run there (portability).<\/li><\/ul><p>Slides: up to 2–4× faster on CPU and 4× smaller.<\/p>"}, {"p": "B", "m": 5, "q": "Perform one complete QAT pass for y = x · w (MSE loss, w_fake = round(w × 255)/255). Given x = 0.6, y_target = 0.25, w_fp32 = 0.52, lr = 0.2.", "a": "<p><b>Given:<\/b> x = 0.6, y_target = 0.25, w_fp32 = 0.52, lr = 0.2. Single neuron: y = x · w. Loss = (y_pred − y_target)². Fake quantization (8-bit, step 1/255): w_fake = round(w × 255)/255.<\/p>\n<p><b>Step 1, forward pass with fake quantization<\/b><\/p>\n<pre>w_fake = round(0.52 × 255)/255 = round(132.60)/255 = 133/255 ≈ 0.5216\ny_pred = x · w_fake = 0.6 × 0.5216 ≈ 0.3129\nLoss   = (y_pred − y_target)² = (0.3129 − 0.25)² ≈ 0.003962<\/pre>\n<p><b>Step 2, backward pass (gradients)<\/b><\/p>\n<pre>dL/dy_pred  = 2 (y_pred − y_target) = 2 × (0.3129 − 0.25) ≈ 0.1259\ndy_pred/dw_fake = x = 0.6\ndw_fake/dw_fp32 ≈ 1          (Straight-Through Estimator: treat round() as identity)\ndL/dw_fp32 ≈ 0.1259 × 0.6 ≈ 0.0755<\/pre>\n<p><b>Step 3, update the floating-point weight (gradient descent)<\/b><\/p>\n<pre>w_fp32,new = w_fp32 − lr × dL/dw_fp32 = 0.52 − 0.2 × 0.0755 ≈ 0.50489<\/pre>\n<p><b>Step 4, re-quantize the updated weight<\/b><\/p>\n<pre>w_fake,new = round(0.50489 × 255)/255 = round(128.75)/255 = 129/255 ≈ 0.5059<\/pre>\n<p><b>Step 5, new prediction and loss<\/b><\/p>\n<pre>y_pred,new = 0.6 × 0.5059 ≈ 0.3035\nLoss_new   = (0.3035 − 0.25)² ≈ 0.002865<\/pre><p><b>Comment:<\/b> the updated weight moved to a new quantization level (code 133 → 129), and the loss decreased from 0.003962 to 0.002865. QAT trains the weight <i>while<\/i> it is being quantized, so the final weights work well in INT8.<\/p>"}, {"p": "B", "m": 5, "q": "For x = [−0.9, 0.2, 1.1, 3.4, 0], apply 8-bit asymmetric quantization: compute the scale, zero-point, quantized and dequantized values, and the MSE.", "a": "<p><b>Asymmetric 8-bit<\/b> maps the real range [β, α] = [min, max] onto [0, 2ⁿ − 1] = [0, 255].<\/p>\n<pre>s   = (α − β)/(2^n − 1)\nz   = round(−β / s)\nx_q = clamp( round(x/s) + z , 0, 255 )\nx̂   = s × (x_q − z)\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, range:<\/b> α = max = 3.40, β = min = −0.90<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = (3.40 − (−0.90))/255 = 4.30/255 ≈ 0.01686\nz = round(−(−0.90) / 0.01686) = round(53.37) = 53<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize every value:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x/s + z<\/th><th>x_q<\/th><th>x̂ = s(x_q − z)<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>−0.90<\/td><td>−53.37<\/td><td>−0.37<\/td><td><b>0<\/b><\/td><td>−0.8937<\/td><td>−0.0063<\/td><td>0.00003937<\/td><\/tr><tr><td>0.20<\/td><td>11.86<\/td><td>64.86<\/td><td><b>65<\/b><\/td><td>0.2024<\/td><td>−0.0024<\/td><td>0.00000554<\/td><\/tr><tr><td>1.10<\/td><td>65.23<\/td><td>118.23<\/td><td><b>118<\/b><\/td><td>1.0961<\/td><td>0.0039<\/td><td>0.00001538<\/td><\/tr><tr><td>3.40<\/td><td>201.63<\/td><td>254.63<\/td><td><b>255<\/b><\/td><td>3.4063<\/td><td>−0.0063<\/td><td>0.00003937<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td>53.00<\/td><td><b>53<\/b><\/td><td>0.0000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.00003937 + 0.00000554 + 0.00001538 + 0.00003937 + 0.00000000) / 5 ≈ 0.00001993<\/pre>\n<p><b>Comment:<\/b> 0 maps exactly to the zero-point 53, so it has no error. Every error is at most s/2 ≈ 0.008. Each value now takes 1 byte instead of 4.<\/p>"}, {"p": "B", "m": 5, "q": "For the same x = [−0.9, 0.2, 1.1, 3.4, 0], apply 8-bit symmetric quantization with MSE. Compare with the asymmetric result.", "a": "<p><b>Symmetric 8-bit<\/b> maps [−α, +α] (α = largest absolute value) onto [−127, +127]. −128 is dropped to keep it symmetric. The zero-point is always 0.<\/p>\n<pre>α   = max |x|\ns   = α / (2^(n−1) − 1) = α / 127\nx_q = clamp( round(x/s), −127, 127 )\nx̂   = s × x_q\nMSE = (1/N) Σ (x − x̂)²<\/pre>\n<p><b>Step 1, α:<\/b> α = max |x| = 3.40<\/p>\n<p><b>Step 2, scale and zero-point:<\/b><\/p>\n<pre>s = 3.40 / 127 ≈ 0.02677\nz = 0   (symmetric)<\/pre>\n<p><b>Step 3 and 4, quantize and dequantize:<\/b><\/p>\n<div class=\"tw\"><table><tr><th>x<\/th><th>x/s<\/th><th>x_q<\/th><th>x̂ = s · x_q<\/th><th>x − x̂<\/th><th>(x − x̂)²<\/th><\/tr><tr><td>−0.90<\/td><td>−33.62<\/td><td><b>-34<\/b><\/td><td>−0.9102<\/td><td>0.0102<\/td><td>0.00010478<\/td><\/tr><tr><td>0.20<\/td><td>7.47<\/td><td><b>7<\/b><\/td><td>0.1874<\/td><td>0.0126<\/td><td>0.00015872<\/td><\/tr><tr><td>1.10<\/td><td>41.09<\/td><td><b>41<\/b><\/td><td>1.0976<\/td><td>0.0024<\/td><td>0.00000558<\/td><\/tr><tr><td>3.40<\/td><td>127.00<\/td><td><b>127<\/b><\/td><td>3.4000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><tr><td>0.00<\/td><td>0.00<\/td><td><b>0<\/b><\/td><td>0.0000<\/td><td>0.0000<\/td><td>0.00000000<\/td><\/tr><\/table><\/div>\n<p><b>Step 5, MSE:<\/b><\/p>\n<pre>MSE = (0.00010478 + 0.00015872 + 0.00000558 + 0.00000000 + 0.00000000) / 5 ≈ 0.00005382<\/pre>\n<p><b>Comment:<\/b> 0 → 0 exactly. Maximum error is s/2 ≈ 0.013. The maths is simpler (x̂ = s·x_q), but if the data is not centred around 0, part of the range is wasted.<\/p><p><b>Comparison:<\/b> asymmetric MSE ≈ 0.00001993 vs symmetric ≈ 0.00005382. Asymmetric wins because the data is skewed to the positive side.<\/p>"}, {"p": "B", "m": 5, "q": "CNN: input 64×64×1 → Conv2D(8,3×3) → MaxPool(2,2) → Conv2D(16,3×3) → MaxPool(2,2) → Flatten → Dense(32) → Dense(4). Find the parameters per layer, the total, and the model size in FP32 and INT8.", "a": "<p><b>Formulas<\/b> (valid padding, stride 1 as in the slides):<\/p>\n<pre>Conv output size    = N − k + 1\nConv parameters     = (k × k × C_in + 1) × filters      (+1 = one bias per filter)\nMaxPool(2,2) output = size ÷ 2,  parameters = 0\nFlatten             = H × W × C,  parameters = 0\nDense parameters    = (inputs + 1) × units<\/pre>\n<p><b>Layer-by-layer<\/b> (input 64 × 64 × 1):<\/p>\n<div class=\"tw\"><table><tr><th>Layer<\/th><th>Output shape<\/th><th>Parameters<\/th><\/tr><tr><td>Conv2D(8, (3,3))<\/td><td>62 × 62 × 8<\/td><td>(3×3×1 + 1) × 8 = 80<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>31 × 31 × 8<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Conv2D(16, (3,3))<\/td><td>29 × 29 × 16<\/td><td>(3×3×8 + 1) × 16 = 1,168<\/td><\/tr><tr><td>MaxPooling2D(2,2)<\/td><td>14 × 14 × 16<\/td><td>0 (no weights)<\/td><\/tr><tr><td>Flatten<\/td><td>3,136<\/td><td>0 (14×14×16 = 3,136)<\/td><\/tr><tr><td>Dense(32)<\/td><td>32<\/td><td>(3,136 + 1) × 32 = 100,384<\/td><\/tr><tr><td>Dense(4)<\/td><td>4<\/td><td>(32 + 1) × 4 = 132<\/td><\/tr>\n<tr><th>Total<\/th><th><\/th><th>101,764<\/th><\/tr><\/table><\/div>\n<p><b>Model size:<\/b><\/p>\n<pre>FP32: 101,764 × 4 bytes = 407,056 bytes ≈ 397.52 KB ≈ 0.39 MB\nINT8: 101,764 × 1 byte  = 101,764 bytes ≈ 99.38 KB ≈ 0.10 MB\nINT8 is 4× smaller (75% saving).<\/pre>"}]};
+
+const ICON = {
+  eye:'<svg class="ic" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>',
+  check:'<svg class="ic" viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>',
+  book:'<svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>',
+  shuffle:'<svg class="ic" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>',
+  reset:'<svg class="ic" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>'
+};
+const MOTIF = {
+  chip:`<rect x="60" y="25" width="80" height="80" rx="10"/><rect x="82" y="47" width="36" height="36" rx="4"/>${[0,1,2,3].map(i=>`<path d="M${72+i*19} 25v-14M${72+i*19} 105v14M60 ${37+i*19}h-14M140 ${37+i*19}h14"/>`).join("")}`,
+  neuron:`<circle cx="40" cy="65" r="14"/><circle cx="130" cy="65" r="22"/><path d="M54 65h50"/><path d="M98 59l8 6-8 6"/><path d="M152 65h28"/><text x="20" y="30" fill="#fff" stroke="none" font-size="16">x</text><path d="M120 110c10 8 20 8 30 0" /><path d="M115 20h30M130 20v-8M118 28l24 0"/>`,
+  ruler:`<path d="M15 90h165"/>${Array.from({length:12},(_,i)=>`<path d="M${20+i*14} 90v${i%4==0?-24:-12}"/>`).join("")}<path d="M40 40h120"/><path d="M40 30v20M160 30v20"/><circle cx="100" cy="40" r="5"/>`,
+  grid:`${[0,1,2].map(r=>[0,1,2].map(c=>`<rect x="${20+c*26}" y="${30+r*26}" width="22" height="22" rx="3"/>`).join("")).join("")}<path d="M100 69h20"/><path d="M114 63l8 6-8 6"/>${[0,1].map(r=>[0,1].map(c=>`<rect x="${132+c*24}" y="${45+r*24}" width="20" height="20" rx="3"/>`).join("")).join("")}`,
+  board:`<rect x="30" y="30" width="130" height="80" rx="8"/><rect x="70" y="50" width="40" height="40" rx="4"/><path d="M30 50h-14M30 70h-14M30 90h-14M160 50h14M160 70h14M160 90h14"/><path d="M125 50h20M125 62h20M125 74h12"/>`,
+  layers:`<path d="M95 15 170 45 95 75 20 45z"/><path d="M20 65 95 95 170 65"/><path d="M20 85 95 115 170 85"/>`,
+  clock:`<path d="M25 15h70l20 20v85H25z"/><path d="M45 50h50M45 70h50M45 90h30"/><circle cx="140" cy="80" r="35"/><path d="M140 58v22l15 10"/>`,
+  watch:`<circle cx="95" cy="75" r="45"/><path d="M95 30V18M82 15h26M95 75V48M95 75l20 14M133 40l8-8"/>`
+};
+const TABS = [
+  {id:"qat", n:1, label:"1 · QAT numerical", c:"#1967d2", s:"#e8f0fe", motif:"neuron", must:true, title:"QAT numerical", sub:"One complete pass with fake quantization: forward, loss, gradient, update, re-quantize, new loss"},
+  {id:"quant", n:2, label:"2 · Quantization", c:"#7627bb", s:"#f3e8fd", motif:"ruler", must:true, title:"Symmetric & asymmetric quantization", sub:"Scale, zero-point, quantize, dequantize and MSE for a vector"},
+  {id:"cnn", n:3, label:"3 · CNN params & size", c:"#007b83", s:"#e4f7fb", motif:"grid", must:true, title:"CNN parameters & model size", sub:"Layer-by-layer parameters, total, FP32 vs INT8 size"},
+  {id:"deploy", n:4, label:"4 · Deployment", c:"#b06000", s:"#fef3e0", motif:"board", title:"Hardware deployment workflow", sub:"main.cc, model_data.cc, model_data.h and running a model on an ESP32"},
+  {id:"tech", n:5, label:"5 · TinyML techniques", c:"#e37400", s:"#fef4e5", motif:"layers", title:"TinyML techniques", sub:"Pruning, quantization (PTQ/QAT), knowledge distillation, MCU basics"},
+  {id:"mock", label:"Final mock", c:"#174ea6", s:"#e8f0fe", motif:"clock"},
+  {id:"morning", label:"Morning 30 min", c:"#5f6368", s:"#f1f3f4", motif:"watch", title:"Morning 30-min glance"},
+  {id:"last", label:"Last 10 min", c:"#3c4043", s:"#f1f3f4", motif:"watch", title:"Last 10 min before the exam"}
+];
+const MARK = {1:["1 mark","Very short answer"],2:["2 marks","Short answer"],5:["5 marks","Long answer · numerical"]};
+
+const LS="tinyml_drill_v3";
+let st={done:{},tab:"qat",paper:"2",pick:{},opened:{},scroll:{},notes:{},cardEdits:{},split:{active:false,left:"qat",right:"morning"}};
+try{ const o=JSON.parse(localStorage.getItem(LS)||"null"); if(o&&typeof o==="object") st=Object.assign(st,o); }catch(e){}
+if(!st.opened) st.opened={};
+if(!st.scroll) st.scroll={};
+if(!st.notes) st.notes={};
+if(!st.cardEdits) st.cardEdits={};
+if(!st.split) st.split={active:false,left:"qat",right:"morning"};
+const tabScroll = st.scroll;
+function save(){ try{ st.scroll=tabScroll; localStorage.setItem(LS,JSON.stringify(st)); }catch(e){} }
+
+/* ---------------- diagrams ---------------- */
+const FIG = {
+qatflow:`<figure><svg viewBox="0 0 680 215" font-family="Roboto,Arial" font-size="13">
+  <defs><marker id="mkA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#c5221f"/></marker>
+  <marker id="mkB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#137333"/></marker></defs>
+  ${[[10,"w_fp32 = 0.26","stored float"],[180,"w_fake = 66/255","= 0.2588"],[350,"y = x · w_fake","= 0.1294"],[520,"L = (y − t)²","≈ 0.000865"]].map(([x,a,b])=>`<rect x="${x}" y="22" width="150" height="54" rx="10" fill="#fce8e6" stroke="#c5221f"/><text x="${x+75}" y="44" text-anchor="middle" fill="#202124" font-weight="500">${a}</text><text x="${x+75}" y="64" text-anchor="middle" fill="#5f6368" font-size="12">${b}</text>`).join("")}
+  ${[160,330,500].map(x=>`<path d="M${x} 49h16" stroke="#c5221f" stroke-width="2" marker-end="url(#mkA)"/>`).join("")}
+  <text x="340" y="14" text-anchor="middle" fill="#c5221f" font-size="12" font-weight="500">FORWARD (sees the quantized weight)</text>
+  <path d="M595 76 C595 140 85 140 85 80" stroke="#137333" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#mkB)"/>
+  <text x="340" y="150" text-anchor="middle" fill="#137333" font-size="12.5">BACKWARD: dL/dy = 2(y − t) → dL/dw = dL/dy · x (STE: round() counts as 1)</text>
+  <text x="340" y="200" text-anchor="middle" fill="#137333" font-size="12.5">UPDATE: w_new = w − lr · dL/dw  → re-quantize → new y, new loss</text></svg>
+  <figcaption>One QAT pass. The float weight learns; the forward pass always uses its quantized copy.</figcaption></figure>`,
+asym:`<figure><svg viewBox="0 0 640 170" font-family="Roboto,Arial" font-size="13">
+  <text x="20" y="22" fill="#5f6368">real values x</text>
+  <line x1="40" y1="45" x2="600" y2="45" stroke="#202124" stroke-width="2"/>
+  ${[[40,"β = min"],[227,"0"],[600,"α = max"]].map(([x,t])=>`<line x1="${x}" y1="38" x2="${x}" y2="52" stroke="#202124" stroke-width="2"/><text x="${x}" y="72" text-anchor="middle" fill="#202124">${t}</text>`).join("")}
+  <path d="M40 80V112M600 80V112M227 80V112" stroke="#7627bb" stroke-width="1.8" fill="none" stroke-dasharray="4 4"/>
+  <rect x="40" y="112" width="560" height="26" rx="6" fill="#f3e8fd" stroke="#7627bb"/>
+  <text x="48" y="130" fill="#7627bb">0</text><text x="592" y="130" text-anchor="end" fill="#7627bb">255</text>
+  <rect x="206" y="112" width="42" height="26" rx="6" fill="#7627bb"/><text x="227" y="130" text-anchor="middle" fill="#fff" font-weight="500">z</text>
+  <text x="320" y="160" text-anchor="middle" fill="#5f6368">s = (α − β)/255 is the size of one step; real 0 lands on code z</text></svg>
+  <figcaption>Asymmetric: min → 0, max → 255, and 0.0 → the zero-point z.</figcaption></figure>`,
+sym:`<figure><svg viewBox="0 0 640 150" font-family="Roboto,Arial" font-size="13">
+  <line x1="40" y1="40" x2="600" y2="40" stroke="#202124" stroke-width="2"/>
+  ${[[40,"−α"],[320,"0"],[600,"+α"]].map(([x,t])=>`<line x1="${x}" y1="33" x2="${x}" y2="47" stroke="#202124" stroke-width="2"/><text x="${x}" y="66" text-anchor="middle" fill="#202124">${t}</text>`).join("")}
+  <path d="M40 74V100M600 74V100M320 74V100" stroke="#7627bb" stroke-width="1.8" stroke-dasharray="4 4"/>
+  <rect x="40" y="100" width="560" height="26" rx="6" fill="#f3e8fd" stroke="#7627bb"/>
+  <text x="48" y="118" fill="#7627bb">−127</text><text x="592" y="118" text-anchor="end" fill="#7627bb">+127</text>
+  <rect x="300" y="100" width="40" height="26" rx="6" fill="#7627bb"/><text x="320" y="118" text-anchor="middle" fill="#fff" font-weight="500">0</text>
+  <text x="320" y="144" text-anchor="middle" fill="#5f6368">α = max|x|,  s = α/127,  zero-point = 0</text></svg>
+  <figcaption>Symmetric: the range is centred on 0, so no zero-point is needed.</figcaption></figure>`,
+cnn:`<figure><svg viewBox="0 0 640 150" font-family="Roboto,Arial" font-size="12">
+  <defs><marker id="mkC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" fill="#9aa0a6"/></marker></defs>
+  ${[[10,84,"28×28×1","input"],[118,74,"26×26×32","Conv 3×3"],[226,48,"13×13×32","MaxPool"],[334,42,"11×11×64","Conv 3×3"],[442,24,"5×5×64","MaxPool"],[540,16,"1600","Flatten"]].map(([x,h,t,l],i)=>`<rect x="${x+(84-(i==5?14:h))/2}" y="${75-h/2}" width="${i==5?14:h}" height="${h}" rx="4" fill="${i?'#e6f4ea':'#fff'}" stroke="#137333"/><text x="${x+42}" y="130" text-anchor="middle" fill="#202124" font-weight="500">${t}</text><text x="${x+42}" y="146" text-anchor="middle" fill="#5f6368">${l}</text>`).join("")}
+  ${[96,204,312,420,528].map(x=>`<path d="M${x} 75h16" stroke="#9aa0a6" stroke-width="1.5" marker-end="url(#mkC)"/>`).join("")}
+  </svg><figcaption>Your Assignment CNN. Conv 3×3: size − 2. MaxPool 2×2: size ÷ 2. Flatten: H × W × C.</figcaption></figure>`,
+files:`<figure><svg viewBox="0 0 660 210" font-family="Roboto,Arial" font-size="13">
+  <defs><marker id="mkD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#007b83"/></marker></defs>
+  <rect x="10" y="20" width="190" height="78" rx="10" fill="#e4f7fb" stroke="#007b83"/><text x="105" y="44" text-anchor="middle" font-weight="500" fill="#202124">model_data.cc</text><text x="105" y="64" text-anchor="middle" fill="#5f6368" font-size="12">.tflite bytes as C array</text><text x="105" y="82" text-anchor="middle" fill="#5f6368" font-size="12">23,752 B, in flash (PROGMEM)</text>
+  <rect x="10" y="120" width="190" height="70" rx="10" fill="#fff" stroke="#007b83"/><text x="105" y="146" text-anchor="middle" font-weight="500" fill="#202124">model_data.h</text><text x="105" y="166" text-anchor="middle" fill="#5f6368" font-size="12">extern declarations</text>
+  <rect x="250" y="55" width="190" height="100" rx="10" fill="#007b83"/><text x="345" y="82" text-anchor="middle" font-weight="500" fill="#fff">main.cc</text><text x="345" y="104" text-anchor="middle" fill="#fff" font-size="12">#include "model_data.h"</text><text x="345" y="122" text-anchor="middle" fill="#fff" font-size="12">GetModel → Interpreter</text><text x="345" y="140" text-anchor="middle" fill="#fff" font-size="12">AllocateTensors → Invoke</text>
+  <rect x="490" y="55" width="160" height="100" rx="10" fill="#fff" stroke="#007b83"/><text x="570" y="82" text-anchor="middle" font-weight="500" fill="#202124">ESP32</text><text x="570" y="104" text-anchor="middle" fill="#5f6368" font-size="12">flash: model</text><text x="570" y="122" text-anchor="middle" fill="#5f6368" font-size="12">RAM: 100 KB arena</text><text x="570" y="140" text-anchor="middle" fill="#5f6368" font-size="12">→ predicted digit</text>
+  ${["M200 70 C225 70 225 90 246 92","M200 150 C225 150 225 125 246 122","M440 105h46"].map(d=>`<path d="${d}" stroke="#007b83" stroke-width="2" fill="none" marker-end="url(#mkD)"/>`).join("")}
+  </svg><figcaption>The three files are compiled together into one program and flashed to the board.</figcaption></figure>`,
+workflow:`<figure><svg viewBox="0 0 680 90" font-family="Roboto,Arial" font-size="12">
+  <defs><marker id="mkE" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" fill="#007b83"/></marker></defs>
+  ${["Train (TF/Keras)","Convert (.tflite)","Quantize (INT8)","C array (.cc/.h)","main.cc + TFLM","Flash & infer"].map((t,i)=>`<rect x="${6+i*112}" y="20" width="100" height="46" rx="8" fill="${i==5?'#007b83':'#e4f7fb'}" stroke="#007b83"/><text x="${56+i*112}" y="47" text-anchor="middle" fill="${i==5?'#fff':'#202124'}" font-weight="500">${t}</text>`).join("")}
+  ${[0,1,2,3,4].map(i=>`<path d="M${106+i*112} 43h10" stroke="#007b83" stroke-width="1.8" marker-end="url(#mkE)"/>`).join("")}
+  </svg><figcaption>Deployment workflow, left to right.</figcaption></figure>`,
+mcu:`<figure><svg viewBox="0 0 640 190" font-family="Roboto,Arial" font-size="13">
+  <text x="150" y="20" text-anchor="middle" fill="#5f6368">Microprocessor (parts outside)</text>
+  <rect x="100" y="80" width="100" height="40" rx="8" fill="#b06000"/><text x="150" y="105" text-anchor="middle" fill="#fff" font-weight="500">CPU</text>
+  ${[[20,35,"ROM"],[200,35,"RAM"],[20,140,"Timer"],[200,140,"I/O"]].map(([x,y,t])=>`<rect x="${x}" y="${y}" width="80" height="32" rx="6" fill="#fff" stroke="#9aa0a6"/><text x="${x+40}" y="${y+21}" text-anchor="middle" fill="#202124">${t}</text>`).join("")}
+  <path d="M100 85 80 67M200 85 220 67M100 115 80 140M200 115 220 140" stroke="#9aa0a6" stroke-width="1.5"/>
+  <text x="480" y="20" text-anchor="middle" fill="#5f6368">Microcontroller (one chip)</text>
+  <rect x="360" y="32" width="240" height="140" rx="12" fill="#fef3e0" stroke="#b06000" stroke-width="1.5"/>
+  ${[[372,46,"CPU",1],[452,46,"ROM"],[532,46,"RAM"],[372,110,"Timer"],[452,110,"I/O"],[532,110,"Serial"]].map(([x,y,t,f])=>`<rect x="${x}" y="${y}" width="56" height="40" rx="6" fill="${f?'#b06000':'#fff'}" stroke="#b06000"/><text x="${x+28}" y="${y+25}" text-anchor="middle" fill="${f?'#fff':'#202124'}" font-size="12">${t}</text>`).join("")}
+  </svg><figcaption>TinyML runs on microcontrollers: everything on one tiny, low-power chip.</figcaption></figure>`,
+prune:`<figure><svg viewBox="0 0 640 160" font-family="Roboto,Arial" font-size="12">
+  ${(()=>{const L=[[40,[30,70,110]],[140,[50,90]],[240,[70]]];let s="";
+    const draw=(ox,cut)=>{let o="";L.slice(0,2).forEach(([x,ys],li)=>{const nx=L[li+1];ys.forEach((y,a)=>nx[1].forEach((y2,b)=>{const k=`${li}${a}${b}`;const off=cut.includes(k);o+=`<line x1="${ox+x}" y1="${y}" x2="${ox+nx[0]}" y2="${y2}" stroke="${off?'#dadce0':'#5f6368'}" stroke-width="${off?1.2:1.6}" ${off?'stroke-dasharray="4 4"':''}/>`;}));});
+      L.forEach(([x,ys])=>ys.forEach(y=>o+=`<circle cx="${ox+x}" cy="${y}" r="10" fill="#fff" stroke="#202124" stroke-width="1.6"/>`));return o;};
+    s+=draw(30,[]);s+=draw(350,["001","010","021","101"]);
+    s+=`<text x="170" y="150" text-anchor="middle" fill="#5f6368">before</text><text x="490" y="150" text-anchor="middle" fill="#b06000">after pruning synapses (lowest |w·∂L/∂w|)</text>`;
+    s+=`<path d="M300 75h40" stroke="#b06000" stroke-width="2"/><path d="M334 69l8 6-8 6" fill="none" stroke="#b06000" stroke-width="2"/>`;return s;})()}
+  </svg><figcaption>Pruned connections fade to dashed grey.</figcaption></figure>`
+};
+
+/* ---------------- learn-this-first lessons ---------------- */
+const LEARN = {
+qat:`<h4>What is a single neuron?</h4><p>It is one multiplication: <b>y = x · w</b>. x is the input, w is the weight the model learns, y is the prediction. We compare y with the correct answer (the target) using the <b>loss</b> L = (y − target)². Smaller loss means a better weight.</p>
+<h4>How does the weight learn? (gradient descent)</h4><p>The gradient dL/dw tells us which way the loss goes up. We move the weight the other way, a little at a time: <b>w_new = w − lr × dL/dw</b>, where lr is the learning rate. For y = x · w, the chain rule gives <b>dL/dw = 2(y − target) × x</b>.</p>
+<h4>What does “fake quantization” add?</h4><p>On the chip the weight will be stored as an 8-bit integer. QAT copies that during training: before every forward pass the weight is rounded to one of 256 levels, <b>w_fake = round(w × 255)/255</b>, and the prediction uses w_fake. round() has no useful slope, so in the backward pass we use the <b>Straight-Through Estimator</b>: treat round() as if its slope were 1.</p>
+${FIG.qatflow}
+<h4>The 5-step recipe sir asked for</h4>
+<div class="tw"><table><tr><th>Step</th><th>Write</th></tr>
+<tr><td>1. Forward</td><td>w_fake = round(w × 255)/255 → y = x · w_fake → L = (y − t)²</td></tr>
+<tr><td>2. Gradients</td><td>dL/dy = 2(y − t), dL/dw ≈ dL/dy × x (STE)</td></tr>
+<tr><td>3. Update</td><td>w_new = w − lr × dL/dw (update the <b>float</b> weight)</td></tr>
+<tr><td>4. Re-quantize</td><td>w_fake,new = round(w_new × 255)/255</td></tr>
+<tr><td>5. New output</td><td>y_new = x · w_fake,new → L_new = (y_new − t)²</td></tr></table></div>
+<p>Do sir's example (Q9) first; the other three use the same steps with different numbers.</p>`,
+quant:`<h4>Why quantize?</h4><p>A trained model stores every number as a 32-bit float. If we store each as an 8-bit integer (one of 256 levels) the model is <b>4× smaller</b> and integer maths is faster. Quantization is not plain rounding: we <b>map the whole range of values onto the 256 levels</b> using a <b>scale s</b> (the size of one step) and a <b>zero-point z</b> (which integer means 0.0).</p>
+<h4>Asymmetric (0 … 255)</h4>${FIG.asym}
+<pre>s = (max − min)/255        z = round(−min / s)
+x_q = clamp( round(x/s) + z, 0, 255 )        x̂ = s (x_q − z)</pre>
+<h4>Symmetric (−127 … +127)</h4>${FIG.sym}
+<pre>α = max |x|        s = α/127        z = 0
+x_q = clamp( round(x/s), −127, 127 )        x̂ = s · x_q</pre>
+<h4>MSE (how much error we added)</h4><p>For every value: error = x − x̂, square it, then take the average. <b>MSE = (1/N) Σ (x − x̂)²</b>. Always build the table with columns x, x/s, x_q, x̂, (x − x̂)², then add up the last column and divide by N.</p>`,
+cnn:`<h4>What a convolution layer learns</h4><p>Each filter is a small k × k grid of numbers that slides over the image. For an input with C channels, one filter has k × k × C weights plus 1 bias. A layer with F filters therefore has <b>(k × k × C + 1) × F</b> parameters. It does not depend on the image size.</p>
+<h4>How the shape changes</h4><p>3 × 3 convolution (no padding, stride 1): size becomes <b>N − 3 + 1</b>. MaxPool 2 × 2: size is <b>halved</b> (no parameters). Flatten: <b>H × W × C</b> numbers in a line (no parameters). Dense(u) after n inputs: <b>(n + 1) × u</b> parameters.</p>
+${FIG.cnn}
+<h4>Model size</h4><pre>FP32 size = total parameters × 4 bytes
+INT8 size = total parameters × 1 byte
+KB = bytes / 1024        MB = KB / 1024</pre>
+<p>Always draw the table: Layer | Output shape | Parameters (with the formula written in). Then the total and both sizes.</p>`,
+deploy:`<h4>The journey of a model</h4>${FIG.workflow}
+<p>A microcontroller has no operating system and no file system, so it cannot “open” a .tflite file. Instead the model's bytes are pasted into C source code and compiled into the program.</p>
+<h4>The three files</h4>${FIG.files}
+<div class="tw"><table><tr><th>File</th><th>Purpose</th></tr>
+<tr><td>model_data.cc</td><td>The trained model as a C byte array <code>qat_model_quantized_tflite[]</code> + its length (23,752 bytes), stored in flash (PROGMEM)</td></tr>
+<tr><td>model_data.h</td><td>Declares the array and length with <code>extern</code> so main.cc can use them (include guards)</td></tr>
+<tr><td>main.cc</td><td>The program: tensor arena, load model, register ops, build interpreter, allocate tensors, copy input, Invoke(), read output</td></tr></table></div>`,
+tech:`<h4>Why TinyML needs special techniques</h4><p>TinyML runs ML on microcontrollers: 1–400 MHz, 2–512 KB RAM, 150 µW–23.5 mW. Normal models are far too big (MobileNetV1 is 16.9 MB; the board has 256 KB RAM). So we compress models.</p>${FIG.mcu}
+<h4>The three techniques</h4>
+<div class="tw"><table><tr><th>Technique</th><th>What it does</th><th>Purpose</th></tr>
+<tr><td>Pruning</td><td>Remove unimportant synapses or neurons (gradient-based: lowest |w × ∂L/∂w|)</td><td>Fewer weights and operations</td></tr>
+<tr><td>Quantization</td><td>FP32 → INT8 (PTQ after training, QAT during training)</td><td>4× smaller, 2–4× faster, no FPU needed</td></tr>
+<tr><td>Knowledge distillation</td><td>Small student learns to mimic a big teacher</td><td>Small model with near-teacher accuracy</td></tr></table></div>${FIG.prune}`
+};
+
+/* ---------------- builders ---------------- */
+const tabsEl=document.getElementById("tabs"), main=document.getElementById("main");
+const tabBy=id=>TABS.find(t=>t.id===id);
+function qid(tab,i){ return `${tab}-${i}`; }
+function count(tab){ const qs=DATA.topics[tab]; let c=0; qs.forEach((_,i)=>{ if(st.done[qid(tab,i)]) c++; }); return [c,qs.length]; }
+function mockCount(){ let c=0,n=0; ["mock1","mock2"].forEach(k=>DATA[k].forEach((_,i)=>{n++; if(st.done[qid(k,i)]) c++;})); return [c,n]; }
+function marksOf(tab){ return DATA.topics[tab].reduce((a,q)=>a+q.m,0); }
+function pill(t){
+  if(t.id==="start") return "6-hr plan";
+  if(t.id==="last") return "10 min";
+  if(t.id==="morning") return "30 min";
+  if(t.id==="mock"){ const [c,n]=mockCount(); return c?`${c}/${n} done`:"2 papers"; }
+  const [c,n]=count(t.id); return c?`${c}/${n} done`:`${n} questions`;
+}
+function renderTabs(){
+  tabsEl.innerHTML=TABS.map(t=>`<button class="tab" role="tab" style="--c:${t.c}" aria-selected="${st.tab===t.id}" data-tab="${t.id}"><span class="lb">${t.label}</span><span class="pl">${pill(t)}</span></button>`).join("");
+}
+function banner(t,eyebrow,title,meta,btns,big){
+  return `<div class="banner ${big?'big':''}"><svg class="motif" viewBox="0 0 190 130" aria-hidden="true">${MOTIF[t.motif]}</svg>
+    ${eyebrow?`<div class="eyebrow">${eyebrow}</div>`:""}<h2>${title}</h2><div class="meta" data-meta="${t.id}">${meta}</div>
+    ${btns?`<div class="acts"><button class="bb fill" data-all="show">${ICON.eye}Show all answers</button><button class="bb line" data-all="hide">Hide all</button><button class="bb line" data-shuffle="${t.id}">${ICON.shuffle}Shuffle MCQs</button><button class="bb line" data-reset="${t.id}">${ICON.reset}Reset tab</button></div>`:""}</div>`;
+}
+function learnCard(id){ return `<div class="card learn"><div class="lh"><span class="bk">${ICON.book}</span><h3>Learn this first</h3><button data-learn>Hide</button></div><div class="lb">${LEARN[id]}</div></div>`; }
+function fig(a){ return a.replace(/\{\{FIG:(\w+)\}\}/g,(_,k)=>FIG[k]||""); }
+function qCard(tab,i,q,num,topicName,partTag){
+  const id=qid(tab,i), m=MARK[q.m];
+  if(q.o) return mcqCard(tab,i,q,num,topicName,partTag);
+  const isOpen = !!(st.opened && st.opened[id]);
+  return `<div class="card q ${st.done[id]?'done':''}" data-qid="${id}">
+    <div class="qh"><div class="badge">Q${num}</div><div class="t"><b>Question ${num}</b><span>${partTag?partTag+" · ":""}${topicName} · ${m[1]}</span></div><span class="mk">${m[0]}</span></div>
+    <div class="qb"><div class="qt">${q.q}</div>
+      <div class="qa"><button class="ob" data-tog aria-expanded="${isOpen}">${ICON.eye}<span>${isOpen?"Hide answer":"View answer"}</span></button><button class="tb" data-done="${id}">${ICON.check}<span>${st.done[id]?"Done":"Mark as done"}</span></button></div>
+      <div class="ans ${isOpen?'open':''}"><div class="al">✓ Answer key</div>${fig(q.a)}</div></div></div>`;
+}
+function mcqCard(tab,i,q,num,topicName,partTag){
+  const id=qid(tab,i), pick=st.pick[id];
+  const answered = pick!==undefined;
+  const isOpen = answered || !!(st.opened && st.opened[id]);
+  const opts=q.o.map((o,k)=>{
+    let cls="op";
+    if(answered){ if(k===q.c) cls+=" right"; else if(k===pick) cls+=" wrong"; }
+    else if(isOpen && k===q.c){ cls+=" reveal"; }
+    return `<button class="${cls}" data-opt="${k}" ${answered?'aria-disabled="true"':''}><span class="ol">${"ABCD"[k]}</span><span>${o}</span></button>`;
+  }).join("");
+  const verdict = answered ? (pick===q.c?'<div class="vd ok">Correct</div>':`<div class="vd no">Not quite. The answer is ${"ABCD"[q.c]}.</div>`) : "";
+  return `<div class="card q mcq ${st.done[id]?'done':''}" data-qid="${id}" data-c="${q.c}">
+    <div class="qh"><div class="badge">Q${num}</div><div class="t"><b>Question ${num}</b><span>${partTag?partTag+" · ":""}${topicName} · Multiple choice</span></div><span class="mk">1 mark</span></div>
+    <div class="qb"><div class="qt">${q.q}</div>
+      <div class="ops">${opts}</div>
+      <div class="ans ${isOpen?'open':''}">${verdict}<div class="al">✓ Why</div>${q.a}</div>
+      ${answered?`<div class="qa"><button class="tb" data-retry="${id}">Try again</button></div>`:""}</div></div>`;
+}
+function topicMeta(id){ const [c,n]=count(id); return `${n} questions · ${marksOf(id)} marks · ${c} of ${n} done`; }
+function topicPane(t){
+  const qs=DATA.topics[t.id];
+  let h=banner(t,`Sir's topic ${t.n}${t.must?" · do not miss":""}`,t.title,topicMeta(t.id),true);
+  let num=0;
+  [[1,"Step 1 · 1-mark MCQs · learn the words"],[2,"Step 2 · 2-mark · small calculations"],[5,"Step 3 · 5-mark · full numericals"]].forEach(([m,nm])=>{
+    const list=qs.map((q,i)=>[q,i]).filter(([q])=>q.m===m); if(!list.length) return;
+    h+=`<div class="sect">${nm}</div>`;
+    list.forEach(([q,i])=>{ num++; h+=qCard(t.id,i,q,num,t.title,""); });
+  });
+  return h;
+}
+function mockPane(t){
+  const p=st.paper==="1"?"1":"2", key="mock"+p, qs=DATA[key];
+  let h=`<div class="banner"><svg class="motif" viewBox="0 0 190 130" aria-hidden="true">${MOTIF.clock}</svg><div class="eyebrow">Practice paper</div><h2>Final mock</h2>
+    <div class="meta" data-meta="mock">Pick the format sir might use, then attempt it on paper</div>
+    <div class="acts"><button class="bb line" data-paper="2" aria-pressed="${p==="2"}">Format B · Part A 2 mark + Part B 5 mark</button><button class="bb line" data-paper="1" aria-pressed="${p==="1"}">Format A · Part A 1 mark + Part B 2 mark</button></div>
+    <div class="acts"><button class="bb fill" data-all="show">${ICON.eye}Show all answers</button><button class="bb line" data-all="hide">Hide all</button><button class="bb line" data-shuffle="mock">${ICON.shuffle}Shuffle MCQs</button><button class="bb line" data-reset="mock">${ICON.reset}Reset tab</button></div></div>`;
+  h+=`<div class="instr"><h3>Instructions</h3><ul>
+    <li>Format A's Part A is <b>multiple choice</b> (1 mark each).</li><li>Sir: the paper has <b>Part A and Part B</b>. If Part A is 1-mark, Part B is 2-mark. If Part A is 2-mark, Part B is 5-mark. The number of questions per part is not announced, so these papers are sized for practice.</li>
+    <li>Every numerical here uses <b>new numbers</b> you have not seen in the topic tabs. A few theory questions repeat on purpose because they are likely.</li>
+    <li>Write every answer on paper first, then open the answer key. Mark as done only if yours matched.</li></ul></div>`;
+  const names={qat:"QAT",quant:"Quantization",cnn:"CNN"};
+  ["A","B"].forEach(part=>{
+    const list=qs.map((q,i)=>[q,i]).filter(([q])=>q.p===part);
+    h+=`<div class="sect">Part ${part} · ${list[0][0].m}-mark questions</div>`;
+    list.forEach(([q,i],k)=>{ h+=qCard(key,i,q,k+1,"Mock","Part "+part); });
+  });
+  return h;
+}
+function startPane(t){
+  const plan=[["0:00–0:25","morning","Read the formulas once. Don't memorise yet."],["0:25–1:35","qat","Learn card → sir's example (Q9) by hand → other 3 numericals."],["1:35–2:50","quant","Learn card → asymmetric + symmetric tables with MSE, by hand."],["2:50–3:45","cnn","Learn card → layer tables for 3 models, sizes in KB."],["3:45–4:15","deploy","The three files + main.cc steps. Draw the workflow once."],["4:15–4:45","tech","Pruning, PTQ/QAT, distillation, MCU table."],["4:45–5:40","mock","Format B on paper (timed), then Format A."],["5:40–6:00","morning","Redo anything not marked done."],["Exam morning","morning","30-min glance sheet, timed card by card."],["Outside the hall","last","Last 10 min: formulas + traps only."]];
+  let h=banner(t,"Mid-Sem","TinyML Mid-Sem Drill","Sir's 5 topics · Part A + Part B · Topics 1, 2 and 3 carry the marks",false,true);
+  h+=`<div class="card"><div class="pad"><h3>Exam pattern (from sir)</h3>
+    <div class="pattern"><div><b>Format A</b><br>Part A: 1-mark questions<br>Part B: 2-mark questions</div><div><b>Format B</b><br>Part A: 2-mark questions<br>Part B: 5-mark questions (numericals)</div></div>
+    <p>Every topic tab therefore has 1-mark, 2-mark and 5-mark questions, so you're ready for either format. Sir: <b>“Do not miss Topics 1, 2, and 3, as this may result in very low scores.”</b> They get the most 5-mark numericals.</p></div></div>`;
+  h+=`<div class="card"><div class="pad"><h3>Your 6-hour plan</h3><div class="tw"><table class="plantable"><tr><th>Time</th><th>Tab</th><th>What to do</th></tr>${plan.map(([tm,id,f])=>`<tr><td>${tm}</td><td><a data-go="${id}" style="--c:${tabBy(id).c}">${tabBy(id).label}</a></td><td>${f}</td></tr>`).join("")}</table></div></div></div>`;
+  const totals={1:0,2:0,5:0}; Object.values(DATA.topics).forEach(qs=>qs.forEach(q=>totals[q.m]++));
+  h+=`<div class="card"><div class="pad"><h3>How many questions and why</h3><div class="tw"><table><tr><th>Topic</th><th>1-mark</th><th>2-mark</th><th>5-mark</th><th>Why this many</th></tr>
+    ${[["qat","Four full passes: sir's own example plus 3 new sets of numbers (one with a negative gradient)."],["quant","Two asymmetric + two symmetric vectors, all with MSE, plus single-step drills."],["cnn","Three full models (your assignment, slide MNIST, horses-vs-humans) plus single-layer drills."],["deploy","Two long answers (workflow, main.cc) cover anything sir can ask."],["tech","Definitions and comparisons; two long answers (techniques, PTQ, pruning)."]].map(([id,why])=>{const q=DATA.topics[id];return `<tr><td><a data-go="${id}" style="--c:${tabBy(id).c};color:var(--c);cursor:pointer;font-weight:500">${tabBy(id).label}</a></td><td>${q.filter(x=>x.m===1).length}</td><td>${q.filter(x=>x.m===2).length}</td><td>${q.filter(x=>x.m===5).length}</td><td>${why}</td></tr>`;}).join("")}
+    <tr><th>Total</th><th>${totals[1]}</th><th>${totals[2]}</th><th>${totals[5]}</th><th>+ 2 mock papers (${DATA.mock1.length+DATA.mock2.length} questions, all new numbers)</th></tr></table></div></div></div>`;
+  h+=`<div class="tlist">${TABS.filter(x=>x.id!=="start").map(x=>{
+    const sub = x.id==="last"?"Formulas + traps · 10 min":x.id==="morning"?"Exam-morning glance · 30 min":x.id==="mock"?(()=>{const[c,n]=mockCount();return `${n} questions · ${c} done`;})():(()=>{const[c,n]=count(x.id);return `${n} questions · ${c} done`;})();
+    return `<button class="tcard" style="--c:${x.c}" data-go="${x.id}"><span class="ci">${x.n||(x.id==="mock"?"M":x.id==="morning"?"30":"10")}</span><span><b>${x.title||x.label}${x.must?'<span class="must">must</span>':''}</b><span class="s" data-sub="${x.id}">${sub}</span></span></button>`;}).join("")}</div>`;
+  return h;
+}
+function sheetGrid(C, paneId){
+  return `<div class="csgrid">${C.map(([c,t2,b], idx)=>{
+    const cardKey = `${paneId||'cs'}_${idx}`;
+    const userNote = (st.notes && st.notes[cardKey]) || "";
+    const customBody = (st.cardEdits && st.cardEdits[cardKey]);
+    const hasEdits = customBody !== undefined;
+    return `<div class="cs" style="--c:${c}" data-card-key="${cardKey}">
+      <div class="cs-head">
+        <h4>${t2}</h4>
+        <div class="cs-tools">
+          <button class="cs-tool-btn add-box-btn" data-add-box="${cardKey}" title="Add a separate grey box for formulas/steps inside this card">+ Add box</button>
+          ${hasEdits ? `<button class="cs-tool-btn" data-reset-card="${cardKey}" title="Reset card to original content">↺ Reset</button>` : ''}
+          <button class="cs-tool-btn" data-edit-card="${cardKey}" title="Edit card content">✏️ Edit card</button>
+        </div>
+      </div>
+      <div class="cs-body" id="body-${cardKey}">${hasEdits ? customBody : b}</div>
+      <div class="cs-card-footer">
+        <div class="cs-tools">
+          <button class="cs-tool-btn add-box-btn" data-add-box="${cardKey}" title="Add a separate grey box for formulas/steps inside this card">+ Add box</button>
+          ${hasEdits ? `<button class="cs-tool-btn" data-reset-card="${cardKey}" title="Reset card to original content">↺ Reset</button>` : ''}
+          <button class="cs-tool-btn" data-edit-card="${cardKey}" title="Edit card content">✏️ Edit card</button>
+        </div>
+      </div>
+      <div class="cs-notepad">
+        <div class="notepad-header">
+          <span class="notepad-title">📝 My Notes & Exam Tips</span>
+          <span class="notepad-status" id="status-${cardKey}">✓ Saved</span>
+        </div>
+        <textarea class="notepad-area" data-note-key="${cardKey}" placeholder="Type personal notes, formulas, or reminders for this card...">${userNote}</textarea>
+        <div class="notepad-footer">
+          <button class="notepad-save-btn" data-save-note="${cardKey}">💾 Save note</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+function morningPane(t){
+  let h=banner(t,"Exam morning","30-minute glance","Read top to bottom. The minute marks keep you on time. Write nothing, just recall.",false);
+  h+=sheetGrid([
+   ["#c5221f","0–8 min · 1 · QAT pass",`<pre>1 Forward   w_fake = round(w × 255)/255
+            y = x · w_fake      L = (y − t)²
+2 Gradient  dL/dy = 2(y − t)
+            dL/dw ≈ dL/dy × x          (STE: round() → slope 1)
+3 Update    w_new = w − lr × dL/dw     (FLOAT weight)
+4 Requant   w_fake,new = round(w_new × 255)/255
+5 New       y_new = x · w_fake,new     L_new = (y_new − t)²</pre>
+<p><b>Sir's chain:</b> 0.26 → round(66.3) = 66 → 0.2588 → y 0.1294 → L 0.000865 (slide 0.000868) → dL/dy 0.0588 → dL/dw 0.0294 → w 0.25706 → round(65.55) = 66 → same loss.</p>
+<div class="tw"><table><tr><th>Iter</th><th>w_fp32</th><th>w_fake</th><th>y</th><th>Loss</th></tr><tr><td>1</td><td>0.26</td><td>0.2588</td><td>0.1294</td><td>0.000868</td></tr><tr><td>2</td><td>0.25706</td><td>0.2588</td><td>0.1294</td><td>0.000868</td></tr><tr><td>3</td><td>0.254</td><td>0.2549</td><td>0.1274</td><td>0.000758</td></tr><tr><td>4</td><td>0.251</td><td>0.2510</td><td>0.1255</td><td>0.000650</td></tr><tr><td>5</td><td>0.248</td><td>0.2480</td><td>0.1240</td><td>0.000576</td></tr></table></div>
+<p><b>Why same loss in iter 2:</b> change 0.0029 < one step 1/255 ≈ 0.0039. <b>If y &lt; t</b>, the gradient is negative and w goes up.</p>`],
+   ["#7627bb","8–16 min · 2 · Quantization",`<pre>ASYMMETRIC [β, α] → [0, 2ⁿ − 1] (8-bit: 0…255)
+s = (α − β)/(2ⁿ − 1) = (max − min)/255
+z = round(−β / s)
+x_q = clamp(round(x/s) + z, 0, 255)      x̂ = s(x_q − z)
+
+SYMMETRIC [−α, α] → [−(2ⁿ⁻¹ − 1), 2ⁿ⁻¹ − 1] (8-bit: −127…127)
+α = max|x|    s = α/(2ⁿ⁻¹ − 1) = α/127    z = 0
+x_q = clamp(round(x/s), −127, 127)       x̂ = s · x_q
+
+MSE = (1/N) Σ (x − x̂)²</pre>
+<p><b>Table to draw:</b> x | x/s | (+z) | x_q | x̂ | (x − x̂)². Sum the last column, divide by N.</p>
+<p><b>Slide asym</b> [43.31, −44.93, 0, 22.99, −43.93]: s = 0.34604, z = 130 → [255, 0, 130, 196, 3].<br><b>Slide sym</b> [43.31, −44.93, 0, 22.99, −11.35]: s = 0.35378 → [122, −127, 0, 65, −32].</p>
+<p><b>Compare:</b> asymmetric has lower MSE when the data is skewed; symmetric is simpler (no zero-point). −128 is dropped to stay symmetric.</p>`],
+   ["#137333","16–22 min · 3 · CNN",`<pre>Conv  : out = N − k + 1      params = (k·k·C_in + 1) × filters
+Pool  : out = N / 2          params = 0
+Flat  : H·W·C                params = 0
+Dense : params = (inputs + 1) × units
+Size  : FP32 = params × 4 B   INT8 = params × 1 B   KB = B / 1024</pre>
+<div class="tw"><table><tr><th>Assignment CNN</th><th>Shape</th><th>Params</th></tr>
+<tr><td>Conv2D(32,3×3)</td><td>26×26×32</td><td>320</td></tr><tr><td>MaxPool</td><td>13×13×32</td><td>0</td></tr>
+<tr><td>Conv2D(64,3×3)</td><td>11×11×64</td><td>18,496</td></tr><tr><td>MaxPool</td><td>5×5×64</td><td>0</td></tr>
+<tr><td>Flatten</td><td>1,600</td><td>0</td></tr><tr><td>Dense(128)</td><td>128</td><td>204,928</td></tr><tr><td>Dense(10)</td><td>10</td><td>1,290</td></tr>
+<tr><th>Total</th><th></th><th>225,034</th></tr></table></div>
+<p>FP32 ≈ 879.04 KB, INT8 ≈ 219.76 KB (your TFLite files: 883 KB / 230 KB). The Dense layer after Flatten holds most of the parameters.</p>`],
+   ["#007b83","22–26 min · 4 · Deployment",`<p><b>Workflow:</b> Train (TF/Keras) → Convert (.tflite) → Quantize (INT8) → C array → main.cc + TFLite Micro → Flash → Infer on device.</p>
+<div class="tw"><table><tr><th>File</th><th>Role</th></tr>
+<tr><td>model_data.cc</td><td>Model bytes as a C array, 23,752 B, in flash (PROGMEM). No file system on the MCU.</td></tr>
+<tr><td>model_data.h</td><td>extern declarations of the array + length, include guards</td></tr>
+<tr><td>main.cc</td><td>Runs the model on the board</td></tr></table></div>
+<p><b>main.cc in order:</b> tensor arena 100 KB → GetModel() → schema version check → MicroMutableOpResolver&lt;6&gt; (Quantize, Conv2D, MaxPool2D, Reshape, FullyConnected, Dequantize) → MicroInterpreter → AllocateTensors() → copy 784 pixels into input (1×28×28×1) → Invoke() (timed with micros) → argmax of the 10 outputs.</p>`],
+   ["#b06000","26–30 min · 5 · Techniques",`<p><b>TinyML</b> = ML on microcontrollers at mW power, always-on, battery-powered. MCU: 1–400 MHz, 2–512 KB RAM, 150 µW–23.5 mW. MobileNetV1 16.9 MB vs 256 KB RAM, which is why we compress.</p>
+<div class="tw"><table><tr><th>Technique</th><th>Purpose</th></tr>
+<tr><td>Pruning</td><td>Remove synapses/neurons. Gradient-based score S = |w × ∂L/∂w|; prune the lowest, then fine-tune.</td></tr>
+<tr><td>Quantization</td><td>FP32 → INT8: 4× smaller, 2–4× faster, no FPU. PTQ = after training (observers, calibrate); QAT = during training (fake quant + STE).</td></tr>
+<tr><td>Knowledge distillation</td><td>Small student mimics a big teacher during training.</td></tr></table></div>
+<p>MobileNet v1: FP32 71.03% · PTQ 69.57% (▼1.46) · QAT 71.06%.</p>`]
+  ], "morning");
+  return h;
+}
+function lastPane(t){
+  let h=banner(t,"Outside the hall","Last 10 minutes","Formulas and the traps that lose marks. Nothing new.",false);
+  h+=sheetGrid([
+   ["#c5221f","QAT",`<pre>w_f = round(w·255)/255 ; y = x·w_f ; L = (y−t)²
+dL/dw = 2(y−t)·x ; w' = w − lr·dL/dw
+re-round w' → y' → L'</pre>`],
+   ["#7627bb","Quantization",`<pre>Asym: s=(α−β)/(2ⁿ−1)=(max−min)/255  z=round(−β/s)
+      q=clamp(round(x/s)+z,0,255)  x̂=s(q−z)
+Sym : α=max|x|  s=α/(2ⁿ⁻¹−1)=α/127  z=0
+      q=clamp(round(x/s),±127)  x̂=s·q
+MSE = mean of (x − x̂)²</pre>`],
+   ["#137333","CNN",`<pre>Conv  (k·k·Cin + 1)·F    out N−k+1
+Pool  0 params           out N/2
+Dense (in + 1)·units
+FP32 ×4 B · INT8 ×1 B · KB = /1024</pre>`],
+   ["#007b83","Deployment",`<p>.cc = model bytes · .h = extern · main.cc = arena → GetModel → resolver → interpreter → AllocateTensors → Invoke → argmax.</p>`],
+   ["#b06000","Techniques",`<p>Pruning · Quantization (PTQ / QAT) · Knowledge distillation. Pruning score |w·∂L/∂w|.</p>`],
+   ["#5f6368","Traps that cost marks",`<ul><li>Write the <b>formula first</b>, then substitute. Method marks.</li><li>round(161.5) = 162 (.5 rounds up).</li><li>Asym: <b>clamp</b> to 0–255. Sym: ±127, zero-point 0.</li><li>Update the <b>float</b> weight, then re-quantize.</li><li>If y &lt; target, the gradient is negative and w <b>increases</b>.</li><li>Conv and Dense: don't forget the <b>+1 bias</b>. Pool/Flatten = 0.</li><li>Size: × 4 for FP32, × 1 for INT8, ÷ 1024 for KB.</li><li>MSE: divide by N (the number of values).</li></ul>`]
+  ], "last");
+  return h;
+}
+/* ---------------- render ---------------- */
+function numberPres(scope){
+  scope.querySelectorAll("pre").forEach(p=>{
+    if(p.dataset.n) return;
+    p.dataset.n = "1";
+    const rawHtml = p.innerHTML;
+    const txt = p.textContent;
+    const isCode = txt.includes("tf.lite") || txt.includes("#include") || txt.includes("constexpr") ||
+                   txt.includes("PROGMEM") || txt.includes("MicroMutableOpResolver") ||
+                   txt.includes("alignas") || txt.includes("tflite::") || txt.includes("uint8_t");
+    if(isCode){
+      p.classList.add("code-block");
+      p.innerHTML = rawHtml.replace(/\n$/,"").split("\n").map(l=>`<span class="code-line">${l||" "}</span>`).join("");
+      return;
+    }
+    p.classList.add("calc-steps");
+    const rawLines = rawHtml.replace(/\n$/,"").split("\n");
+    let stepNum = 1;
+    const out = [];
+    for(let l of rawLines){
+      const trimmed = l.trim();
+      if(!trimmed){
+        out.push('<div class="step-spacer"></div>');
+        continue;
+      }
+      const isCont = /^ {6,}/.test(l) && !/^ {0,5}[1-9]\b/.test(l);
+      if(isCont){
+        out.push('<div class="step-line cont"><span class="step-badge-placeholder"></span><span class="step-text">' + trimmed + '</span></div>');
+        continue;
+      }
+      const matchPrefix = trimmed.match(/^([1-9])\s+([A-Za-z]+)\s*(.*)$/);
+      if(matchPrefix){
+        const sNum = matchPrefix[1];
+        const sName = matchPrefix[2];
+        const sRest = matchPrefix[3];
+        const body = sRest ? ('<b>' + sName + ':</b> ' + sRest) : ('<b>' + sName + '</b>');
+        out.push('<div class="step-line"><span class="step-badge">Step ' + sNum + '</span><span class="step-text">' + body + '</span></div>');
+      } else {
+        out.push('<div class="step-line"><span class="step-badge">Step ' + stepNum + '</span><span class="step-text">' + trimmed + '</span></div>');
+        stepNum++;
+      }
+    }
+    p.innerHTML = out.join("");
+  });
+}
+function paneHTML(t){ return t.id==="start"?startPane(t):t.id==="last"?lastPane(t):t.id==="morning"?morningPane(t):t.id==="mock"?mockPane(t):topicPane(t); }
+function renderAll(){
+  renderTabs();
+  const splitBar = document.getElementById("splitBar");
+  const splitBtn = document.getElementById("splitBtn");
+  if(st.split && st.split.active){
+    renderSplitView();
+  } else {
+    document.body.classList.remove("split-mode");
+    if(splitBar) splitBar.style.display = "none";
+    if(splitBtn){
+      splitBtn.innerHTML = `<span class="split-icon">◫</span> <span class="split-txt">Split view</span>`;
+      splitBtn.classList.remove("exit-btn");
+    }
+    main.innerHTML=TABS.map(t=>`<section class="pane ${st.tab===t.id?'on':''}" id="pane-${t.id}" style="--tc:${t.c};--ts:${t.s}" role="tabpanel">${paneHTML(t)}</section>`).join("");
+    numberPres(main);
+  }
+}
+function updateRatioBtns(r){
+  const num = Math.round(r);
+  document.querySelectorAll("[data-ratio]").forEach(btn=>{
+    const bNum = Math.round(parseFloat(btn.dataset.ratio));
+    btn.classList.toggle("active", Math.abs(num - bNum) <= 4);
+  });
+}
+function renderSplitView(){
+  document.body.classList.add("split-mode");
+  const leftTab = tabBy(st.split.left) || TABS[0];
+  const rightTab = tabBy(st.split.right) || tabBy("morning") || TABS[1];
+  st.split.left = leftTab.id;
+  st.split.right = rightTab.id;
+  if(st.split.ratio === undefined) st.split.ratio = 50;
+
+  const splitBar = document.getElementById("splitBar");
+  if(splitBar) splitBar.style.display = "flex";
+
+  const splitBtn = document.getElementById("splitBtn");
+  if(splitBtn){
+    splitBtn.innerHTML = `✕ Exit split view`;
+    splitBtn.classList.add("exit-btn");
+  }
+
+  const leftSel = document.getElementById("splitLeftSelect");
+  const rightSel = document.getElementById("splitRightSelect");
+  if(leftSel) leftSel.innerHTML = TABS.map(t=>`<option value="${t.id}" ${t.id===leftTab.id?'selected':''}>${t.label}</option>`).join("");
+  if(rightSel) rightSel.innerHTML = TABS.map(t=>`<option value="${t.id}" ${t.id===rightTab.id?'selected':''}>${t.label}</option>`).join("");
+
+  updateRatioBtns(st.split.ratio);
+
+  main.innerHTML = `<div class="split-container" id="splitContainer" style="--split-left:${st.split.ratio}%">
+    <div class="split-col" id="split-col-left" style="--tc:${leftTab.c};--ts:${leftTab.s}">
+      <section class="pane on" id="pane-${leftTab.id}" role="tabpanel">${paneHTML(leftTab)}</section>
+    </div>
+    <div class="split-divider" id="splitDivider" title="Drag to resize columns"></div>
+    <div class="split-col" id="split-col-right" style="--tc:${rightTab.c};--ts:${rightTab.s}">
+      <section class="pane on" id="pane-${rightTab.id}" role="tabpanel">${paneHTML(rightTab)}</section>
+    </div>
+  </div>`;
+  numberPres(main);
+
+  const leftCol = document.getElementById("split-col-left");
+  const rightCol = document.getElementById("split-col-right");
+  if(leftCol && tabScroll[leftTab.id]) leftCol.scrollTop = tabScroll[leftTab.id];
+  if(rightCol && tabScroll[rightTab.id]) rightCol.scrollTop = tabScroll[rightTab.id];
+}
+function openSplitModal(){
+  const overlay = document.getElementById("splitModalOverlay");
+  const modalLeft = document.getElementById("modalLeftSelect");
+  const modalRight = document.getElementById("modalRightSelect");
+  modalLeft.innerHTML = TABS.map(t=>`<option value="${t.id}" ${t.id===(st.tab||'qat')?'selected':''}>${t.label}</option>`).join("");
+  modalRight.innerHTML = TABS.map(t=>`<option value="${t.id}" ${t.id===(st.split&&st.split.right||'morning')?'selected':''}>${t.label}</option>`).join("");
+  overlay.style.display = "grid";
+}
+function closeSplitModal(){
+  const overlay = document.getElementById("splitModalOverlay");
+  if(overlay) overlay.style.display = "none";
+}
+function rerender(id){ const t=tabBy(id), el=document.getElementById("pane-"+id); if(el){ el.innerHTML=paneHTML(t); numberPres(el); } }
+function refreshCounts(){
+  renderTabs();
+  TABS.forEach(t=>{ if(DATA.topics[t.id]){ const m=document.querySelector(`[data-meta="${t.id}"]`); if(m) m.textContent=topicMeta(t.id);} });
+}
+function rerenderCard(card){
+  const id=card.dataset.qid, [tab,i]=[id.slice(0,id.lastIndexOf("-")), +id.slice(id.lastIndexOf("-")+1)];
+  const q = DATA.topics[tab] ? DATA.topics[tab][i] : DATA[tab][i];
+  const num = card.querySelector(".badge").textContent.slice(1);
+  const meta = card.querySelector(".qh .t span").textContent;
+  const part = meta.startsWith("Part") ? meta.split(" · ")[0] : "";
+  const tname = DATA.topics[tab] ? tabBy(tab).title : "Mock";
+  const tmp=document.createElement("div"); tmp.innerHTML=qCard(tab,i,q,num,tname,part);
+  const n=tmp.firstElementChild; card.replaceWith(n); numberPres(n);
+}
+function shuffleArray(arr){
+  for(let i=arr.length-1; i>0; i--){
+    const j=Math.floor(Math.random()*(i+1));
+    const t=arr[i]; arr[i]=arr[j]; arr[j]=t;
+  }
+  return arr;
+}
+function shuffleMcqOptions(q){
+  if(!q.o || q.o.length < 2) return;
+  const indices = q.o.map((_, idx) => idx);
+  shuffleArray(indices);
+  q.o = indices.map(idx => q.o[idx]);
+  q.c = indices.indexOf(q.c);
+}
+function resetTab(tabId){
+  const prefix = tabId === "mock" ? "mock" : tabId + "-";
+  Object.keys(st.done).forEach(k => { if(k.startsWith(prefix)) delete st.done[k]; });
+  Object.keys(st.pick).forEach(k => { if(k.startsWith(prefix)) delete st.pick[k]; });
+  if (st.opened) {
+    Object.keys(st.opened).forEach(k => { if(k.startsWith(prefix)) delete st.opened[k]; });
+  }
+  tabScroll[tabId] = 0;
+  save();
+  rerender(tabId);
+  refreshCounts();
+  window.scrollTo({top: 0, behavior: "instant"});
+}
+function shuffleTab(tabId){
+  if(tabId === "mock"){
+    const mcqs = DATA.mock1.filter(q => q.m === 1);
+    const others = DATA.mock1.filter(q => q.m !== 1);
+    mcqs.forEach(q => shuffleMcqOptions(q));
+    shuffleArray(mcqs);
+    DATA.mock1 = [...mcqs, ...others];
+  } else if(DATA.topics[tabId]){
+    const mcqs = DATA.topics[tabId].filter(q => q.m === 1);
+    const others = DATA.topics[tabId].filter(q => q.m !== 1);
+    mcqs.forEach(q => shuffleMcqOptions(q));
+    shuffleArray(mcqs);
+    DATA.topics[tabId] = [...mcqs, ...others];
+  }
+  resetTab(tabId);
+}
+function show(id){
+  if(st.split && st.split.active){
+    st.split.active = false;
+    save();
+  }
+  if(st.tab){
+    tabScroll[st.tab] = window.scrollY || document.documentElement.scrollTop || 0;
+  }
+  st.tab=id; save();
+  renderAll();
+  const targetY = tabScroll[id] !== undefined ? tabScroll[id] : 0;
+  window.scrollTo({top: targetY, behavior: 'instant'});
+  requestAnimationFrame(()=>{
+    window.scrollTo({top: targetY, behavior: 'instant'});
+  });
+  const b=tabsEl.querySelector(`[data-tab="${id}"]`); if(b) b.scrollIntoView({block:"nearest",inline:"center"});
+}
+window.addEventListener("scroll", ()=>{
+  if(st.tab && (!st.split || !st.split.active)) tabScroll[st.tab] = window.scrollY || document.documentElement.scrollTop || 0;
+}, {passive:true});
+document.addEventListener("scroll", e=>{
+  if(e.target && e.target.classList && e.target.classList.contains("split-col")){
+    const pane = e.target.querySelector(".pane");
+    if(pane && pane.id){
+      const tid = pane.id.replace("pane-", "");
+      tabScroll[tid] = e.target.scrollTop;
+      if(!st.scroll) st.scroll = {};
+      st.scroll[tid] = e.target.scrollTop;
+    }
+  }
+}, true);
+document.addEventListener("input", e=>{
+  const nt = e.target.closest("[data-note-key]");
+  if(nt){
+    const k = nt.dataset.noteKey;
+    if(!st.notes) st.notes = {};
+    st.notes[k] = nt.value;
+    save();
+    const stEl = document.getElementById("status-" + k);
+    if(stEl){
+      stEl.classList.add("show");
+      clearTimeout(stEl._t);
+      stEl._t = setTimeout(()=>stEl.classList.remove("show"), 1500);
+    }
+  }
+});
+document.addEventListener("change", e=>{
+  if(e.target.id === "splitLeftSelect"){
+    st.split.left = e.target.value; save(); renderSplitView();
+  } else if(e.target.id === "splitRightSelect"){
+    st.split.right = e.target.value; save(); renderSplitView();
+  }
+});
+let isDraggingSplit = false;
+document.addEventListener("pointerdown", e=>{
+  const divider = e.target.closest("#splitDivider");
+  if(!divider) return;
+  const container = document.getElementById("splitContainer");
+  if(!container) return;
+  isDraggingSplit = true;
+  divider.classList.add("dragging");
+  document.body.style.userSelect = "none";
+  document.body.style.cursor = "col-resize";
+  try { divider.setPointerCapture(e.pointerId); } catch(err){}
+});
+document.addEventListener("pointermove", e=>{
+  if(!isDraggingSplit) return;
+  const container = document.getElementById("splitContainer");
+  if(!container) return;
+  const rect = container.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const minPx = 220;
+  const maxPx = rect.width - 240;
+  if(maxPx <= minPx) return;
+  const clampedX = Math.max(minPx, Math.min(maxPx, offsetX));
+  const percent = parseFloat(((clampedX / rect.width) * 100).toFixed(1));
+  container.style.setProperty("--split-left", percent + "%");
+  if(!st.split) st.split = {};
+  st.split.ratio = percent;
+  updateRatioBtns(percent);
+});
+function endSplitDrag(e){
+  if(!isDraggingSplit) return;
+  isDraggingSplit = false;
+  document.body.style.userSelect = "";
+  document.body.style.cursor = "";
+  const divider = document.getElementById("splitDivider");
+  if(divider){
+    divider.classList.remove("dragging");
+    try { divider.releasePointerCapture(e.pointerId); } catch(err){}
+  }
+  save();
+}
+document.addEventListener("pointerup", endSplitDrag);
+document.addEventListener("pointercancel", endSplitDrag);
+
+function downloadHtmlWithNotes(){
+  save();
+  const stateStr = JSON.stringify(st).replace(/</g, '\\u003c');
+  let fullHtml = document.documentElement.outerHTML;
+  fullHtml = fullHtml.replace(/<script id="embedded_state">[\s\S]*?<\/script>/, '');
+  const injection = `<script id="embedded_state">try{localStorage.setItem('tinyml_drill_v3', JSON.stringify(${stateStr}));}catch(e){}<\/script>`;
+  const docHtml = '<!DOCTYPE html>\n<html lang="en">' + fullHtml.replace('</head>', injection + '\n</head>');
+  const blob = new Blob([docHtml], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Tiny ML - With My Notes.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  const msg = document.getElementById("syncStatusMsg");
+  if(msg){
+    msg.textContent = "✓ 'Tiny ML - With My Notes.html' downloaded! Send to your phone to study offline.";
+    msg.style.display = "block";
+    setTimeout(()=>{ msg.style.display = "none"; }, 5000);
+  }
+}
+function copySyncCode(){
+  save();
+  const stateStr = JSON.stringify(st);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(stateStr).then(()=>{
+      const msg = document.getElementById("syncStatusMsg");
+      if(msg){
+        msg.textContent = "✓ Notes & cards copied to clipboard! You can paste on your phone.";
+        msg.style.display = "block";
+        setTimeout(()=>{ msg.style.display = "none"; }, 4000);
+      }
+    }).catch(()=>{
+      prompt("Copy this code and paste it on your mobile:", stateStr);
+    });
+  } else {
+    prompt("Copy this code and paste it on your mobile:", stateStr);
+  }
+}
+function importSyncCode(){
+  const pasted = prompt("Paste your sync code here to load notes & card edits:");
+  if(!pasted) return;
+  try {
+    const imported = JSON.parse(pasted.trim());
+    if(imported && typeof imported === "object"){
+      st = imported;
+      save();
+      renderAll();
+      alert("✓ Successfully loaded your notes and card edits!");
+      const modal = document.getElementById("syncModalOverlay");
+      if(modal) modal.style.display = "none";
+    }
+  } catch(e){
+    alert("Invalid code format. Please check the code and try again.");
+  }
+}
+
+document.addEventListener("click",e=>{
+  const syncB = e.target.closest("#syncBtn");
+  if(syncB){
+    const modal = document.getElementById("syncModalOverlay");
+    if(modal) modal.style.display = "grid";
+    return;
+  }
+  const syncClose = e.target.closest("#syncCloseBtn");
+  if(syncClose || e.target.id === "syncModalOverlay"){
+    const modal = document.getElementById("syncModalOverlay");
+    if(modal) modal.style.display = "none";
+    return;
+  }
+  const dlNotes = e.target.closest("#downloadNotesBtn");
+  if(dlNotes){
+    downloadHtmlWithNotes();
+    return;
+  }
+  const cpSync = e.target.closest("#copySyncBtn");
+  if(cpSync){
+    copySyncCode();
+    return;
+  }
+  const impSync = e.target.closest("#importSyncBtn");
+  if(impSync){
+    importSyncCode();
+    return;
+  }
+  const sn = e.target.closest("[data-save-note]");
+  if(sn){
+    const k = sn.dataset.saveNote;
+    const area = document.querySelector(`textarea[data-note-key="${k}"]`);
+    if(area){
+      if(!st.notes) st.notes = {};
+      st.notes[k] = area.value;
+      save();
+      const stEl = document.getElementById("status-" + k);
+      if(stEl){
+        stEl.textContent = "✓ Saved";
+        stEl.classList.add("show");
+        clearTimeout(stEl._t);
+        stEl._t = setTimeout(()=>stEl.classList.remove("show"), 2000);
+      }
+    }
+    return;
+  }
+  const rb = e.target.closest("[data-ratio]");
+  if(rb){
+    const r = parseFloat(rb.dataset.ratio);
+    const container = document.getElementById("splitContainer");
+    if(container) container.style.setProperty("--split-left", r + "%");
+    if(!st.split) st.split = {};
+    st.split.ratio = r;
+    save();
+    updateRatioBtns(r);
+    return;
+  }
+  const sBtn = e.target.closest("#splitBtn");
+  if(sBtn){
+    if(st.split && st.split.active){
+      st.split.active = false; save(); renderAll();
+    } else {
+      openSplitModal();
+    }
+    return;
+  }
+  const sExit = e.target.closest("#splitExitBtn");
+  if(sExit){
+    st.split.active = false; save(); renderAll(); return;
+  }
+  const sSwap = e.target.closest("#splitSwapBtn");
+  if(sSwap){
+    const tmp = st.split.left; st.split.left = st.split.right; st.split.right = tmp;
+    if(st.split.ratio) st.split.ratio = parseFloat((100 - st.split.ratio).toFixed(1));
+    save(); renderSplitView(); return;
+  }
+  const mCancel = e.target.closest("#modalCancelBtn");
+  if(mCancel || e.target.id === "splitModalOverlay"){
+    closeSplitModal(); return;
+  }
+  const mApply = e.target.closest("#modalApplyBtn");
+  if(mApply){
+    st.split.active = true;
+    st.split.left = document.getElementById("modalLeftSelect").value;
+    st.split.right = document.getElementById("modalRightSelect").value;
+    save(); closeSplitModal(); renderAll(); return;
+  }
+  const pr = e.target.closest("[data-preset]");
+  if(pr){
+    const [l, r] = pr.dataset.preset.split(",");
+    document.getElementById("modalLeftSelect").value = l;
+    document.getElementById("modalRightSelect").value = r;
+    return;
+  }
+  const ab = e.target.closest("[data-add-box]");
+  if(ab){
+    const k = ab.dataset.addBox;
+    const bEl = document.getElementById("body-" + k);
+    const edBtns = document.querySelectorAll(`[data-edit-card="${k}"]`);
+    if(bEl){
+      bEl.setAttribute("contenteditable", "true");
+      edBtns.forEach(btn=>{
+        btn.textContent = "💾 Save card";
+        btn.classList.add("active");
+      });
+      const newBox = document.createElement("pre");
+      newBox.className = "calc-box-custom";
+      newBox.setAttribute("contenteditable", "true");
+      newBox.textContent = "New box: Type formulas or numerical steps here...";
+      bEl.appendChild(newBox);
+      if(!st.cardEdits) st.cardEdits = {};
+      st.cardEdits[k] = bEl.innerHTML;
+      save();
+      newBox.focus({ preventScroll: true });
+      newBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      const range = document.createRange();
+      range.selectNodeContents(newBox);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+    return;
+  }
+  const ed = e.target.closest("[data-edit-card]");
+  if(ed){
+    const k = ed.dataset.editCard;
+    const bEl = document.getElementById("body-" + k);
+    const edBtns = document.querySelectorAll(`[data-edit-card="${k}"]`);
+    if(bEl){
+      const isEditing = bEl.getAttribute("contenteditable") === "true";
+      if(isEditing){
+        bEl.removeAttribute("contenteditable");
+        edBtns.forEach(btn=>{
+          btn.textContent = "✏️ Edit card";
+          btn.classList.remove("active");
+        });
+        if(!st.cardEdits) st.cardEdits = {};
+        st.cardEdits[k] = bEl.innerHTML;
+        save();
+        const cardEl = bEl.closest(".cs");
+        if(cardEl && !cardEl.querySelector(`[data-reset-card="${k}"]`)){
+          cardEl.querySelectorAll(".cs-tools").forEach(toolBar=>{
+            const rBtn = document.createElement("button");
+            rBtn.className = "cs-tool-btn";
+            rBtn.dataset.resetCard = k;
+            rBtn.title = "Reset card to original content";
+            rBtn.textContent = "↺ Reset";
+            const edB = toolBar.querySelector(`[data-edit-card="${k}"]`);
+            if(edB) toolBar.insertBefore(rBtn, edB);
+          });
+        }
+      } else {
+        bEl.setAttribute("contenteditable", "true");
+        bEl.focus({ preventScroll: true });
+        edBtns.forEach(btn=>{
+          btn.textContent = "💾 Save card";
+          btn.classList.add("active");
+        });
+      }
+    }
+    return;
+  }
+  const rsc = e.target.closest("[data-reset-card]");
+  if(rsc){
+    const k = rsc.dataset.resetCard;
+    if(st.cardEdits && st.cardEdits[k] !== undefined){
+      const scrollParent = rsc.closest(".split-col");
+      const savedColScroll = scrollParent ? scrollParent.scrollTop : null;
+      const savedWinScroll = window.scrollY || document.documentElement.scrollTop;
+      delete st.cardEdits[k];
+      save();
+      const pPane = rsc.closest(".pane");
+      if(pPane && pPane.id){
+        rerender(pPane.id.replace("pane-", ""));
+        if(scrollParent && savedColScroll !== null){
+          const newCol = document.getElementById(scrollParent.id);
+          if(newCol) newCol.scrollTop = savedColScroll;
+        } else {
+          window.scrollTo({ top: savedWinScroll, behavior: "instant" });
+        }
+      }
+    }
+    return;
+  }
+  const sh=e.target.closest("[data-shuffle]"); if(sh){ shuffleTab(sh.dataset.shuffle); return; }
+  const rs=e.target.closest("[data-reset]"); if(rs){ resetTab(rs.dataset.reset); return; }
+  const tb=e.target.closest("[data-tab]"); if(tb){ show(tb.dataset.tab); return; }
+  const g=e.target.closest("[data-go]"); if(g){ show(g.dataset.go); return; }
+  const tg=e.target.closest("[data-tog]");
+  if(tg){
+    const card=tg.closest(".q");
+    const id=card?card.dataset.qid:null;
+    const a=tg.closest(".qb").querySelector(".ans");
+    const o=a.classList.toggle("open");
+    tg.setAttribute("aria-expanded",o);
+    tg.querySelector("span").textContent=o?"Hide answer":"View answer";
+    if(id){
+      if(!st.opened) st.opened={};
+      if(o) st.opened[id]=1; else delete st.opened[id];
+      save();
+    }
+    return;
+  }
+  const d=e.target.closest("[data-done]");
+  if(d){ const id=d.dataset.done; if(st.done[id]) delete st.done[id]; else st.done[id]=1; save();
+    document.querySelectorAll(`[data-qid="${id}"]`).forEach(c=>{ c.classList.toggle("done",!!st.done[id]); c.querySelector("[data-done] span").textContent=st.done[id]?"Done":"Mark as done"; });
+    refreshCounts(); return; }
+  const al=e.target.closest("[data-all]");
+  if(al){
+    const showA=al.dataset.all==="show", pane=al.closest(".pane");
+    if(!st.opened) st.opened={};
+    pane.querySelectorAll(".card.q").forEach(card=>{
+      const id=card.dataset.qid;
+      if(id){
+        if(showA) st.opened[id]=1; else delete st.opened[id];
+      }
+    });
+    save();
+    pane.querySelectorAll(".q:not(.mcq) .ans").forEach(a=>a.classList.toggle("open",showA));
+    pane.querySelectorAll(".q.mcq").forEach(card=>{
+      const c=+card.dataset.c;
+      card.querySelectorAll("[data-opt]").forEach(b=>b.classList.toggle("reveal",showA && +b.dataset.opt===c));
+      const a=card.querySelector(".ans");
+      if(st.pick[card.dataset.qid]===undefined) a.classList.toggle("open",showA);
+    });
+    pane.querySelectorAll("[data-tog]").forEach(b=>{
+      b.setAttribute("aria-expanded",showA);
+      b.querySelector("span").textContent=showA?"Hide answer":"View answer";
+    });
+    return;
+  }
+  const op=e.target.closest("[data-opt]");
+  if(op){ const card=op.closest(".q"), id=card.dataset.qid; if(st.pick[id]!==undefined) return;
+    const k=+op.dataset.opt, c=+card.dataset.c; st.pick[id]=k; if(k===c) st.done[id]=1; save();
+    rerenderCard(card); refreshCounts(); return; }
+  const rt=e.target.closest("[data-retry]");
+  if(rt){ const id=rt.dataset.retry; delete st.pick[id]; delete st.done[id]; save(); rerenderCard(rt.closest(".q")); refreshCounts(); return; }
+  const pp=e.target.closest("[data-paper]"); if(pp){ st.paper=pp.dataset.paper; save(); rerender("mock"); return; }
+  const lr=e.target.closest("[data-learn]");
+  if(lr){ const c=lr.closest(".learn"); const closed=c.classList.toggle("closed"); lr.textContent=closed?"Show":"Hide"; return; }
+});
+if(!tabBy(st.tab)) st.tab="qat"; if(!st.pick) st.pick={}; if(!st.opened) st.opened={}; if(!st.scroll) st.scroll={};
+if(!st.notes) st.notes={}; if(!st.cardEdits) st.cardEdits={}; if(!st.split) st.split={active:false,left:"qat",right:"morning"};
+renderAll();
+if(tabScroll[st.tab] && (!st.split || !st.split.active)){
+  requestAnimationFrame(()=>{ window.scrollTo({top:tabScroll[st.tab],behavior:'instant'}); });
+}
+</script>
+
+</body></html>
